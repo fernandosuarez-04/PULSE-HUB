@@ -1,44 +1,47 @@
-'use client';
-
 import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/shared/utils/cn';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  children: React.ReactNode;
+const buttonVariants = cva(
+  'inline-flex items-center justify-center gap-2 rounded-[var(--radius-base)] font-medium transition-all duration-[var(--duration-base)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-600)] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+  {
+    variants: {
+      variant: {
+        primary: 'bg-[var(--accent-orange)] text-white hover:opacity-90 hover:shadow-md',
+        secondary: 'border-2 border-[var(--primary-600)] text-[var(--primary-600)] hover:bg-[var(--primary-100)] hover:shadow-sm',
+        tertiary: 'text-[var(--primary-600)] hover:underline hover:opacity-80',
+      },
+      size: {
+        sm: 'h-9 px-3 text-[var(--text-sm)]',
+        md: 'h-11 px-6 text-[var(--text-base)]',
+        lg: 'h-13 px-8 text-[var(--text-lg)]',
+      },
+    },
+    defaultVariants: {
+      variant: 'primary',
+      size: 'md',
+    },
+  }
+);
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
-  size = 'md',
-  className,
-  children,
-  ...props
-}) => {
-  const baseStyles =
-    'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, ...props }, ref) => {
+    return (
+      <button
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
 
-  const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-600 text-white hover:bg-gray-700',
-    outline: 'border border-gray-300 bg-transparent hover:bg-gray-100',
-    ghost: 'bg-transparent hover:bg-gray-100',
-  };
+Button.displayName = 'Button';
 
-  const sizes = {
-    sm: 'h-8 px-3 text-sm',
-    md: 'h-10 px-4',
-    lg: 'h-12 px-6 text-lg',
-  };
-
-  return (
-    <button
-      className={cn(baseStyles, variants[variant], sizes[size], className)}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-
+export default Button;
