@@ -81,6 +81,14 @@
   --primary-100-alpha-30: rgba(232, 239, 253, 0.3);
   --white-alpha-60: rgba(255, 255, 255, 0.6);
   --white-alpha-70: rgba(255, 255, 255, 0.7);
+  
+  /* Banner Heights */
+  --navbar-height: 80px;
+  --banner-height: 60px;
+  
+  /* Banner Colors */
+  --banner-bg-start: #1F5AF6;
+  --banner-bg-end: #4F7BF7;
 }
 
 @theme inline {

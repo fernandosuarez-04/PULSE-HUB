@@ -11,7 +11,7 @@
  */
 
 import type { Metadata } from 'next';
-import { Navbar, Card, AnimatedSection, Footer } from '@/shared/components';
+import { Navbar, Card, AnimatedSection, Footer, AnnouncementBanner } from '@/shared/components';
 import { Target, Shield, Users, Heart } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -62,6 +62,7 @@ export default function SobrePage() {
       {/* AI Context: Esta página presenta el Manifiesto, Valores y Metodología Ecos */}
       
       <Navbar />
+      <AnnouncementBanner />
       
       <main>
         {/* Hero Section */}

@@ -17,7 +17,7 @@ import {
   Sparkles, Calendar, Check, Shield, Copy,
   Settings, TrendingUp, Users as UsersIcon
 } from 'lucide-react';
-import { Navbar, Card, AnimatedSection, Footer } from '@/shared/components';
+import { Navbar, Card, AnimatedSection, Footer, AnnouncementBanner } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
 
 // Tipos TypeScript
@@ -149,7 +149,8 @@ export function AdopcionDiariaClient() {
       {/* AI Context: Esta página implementa Pilar 2 - Adopción Diaria con AI Buddy y rituales */}
       
       <Navbar />
-
+      <AnnouncementBanner />
+      
       <main>
         {/* Hero Section */}
         <section className="relative min-h-[60vh] flex items-center justify-center 

@@ -14,7 +14,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Sparkles, Target, TrendingUp, Shield } from 'lucide-react';
-import { Navbar, Card, AnimatedSection, Button, Footer } from '@/shared/components';
+import { Navbar, Card, AnimatedSection, Button, Footer, AnnouncementBanner } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
 
 // Tipos TypeScript
@@ -147,6 +147,7 @@ export function AutomatizacionClient() {
       {/* AI Context: Esta página implementa Pilar 3 - Automatización con matriz impacto-esfuerzo */}
       
       <Navbar />
+      <AnnouncementBanner />
       
       <main>
         {/* Hero Section */}

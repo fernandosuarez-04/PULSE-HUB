@@ -17,7 +17,7 @@ import {
   FileText, Users, Wrench, Check, 
   Mail, Linkedin 
 } from 'lucide-react';
-import { Navbar, Card, AnimatedSection, Footer } from '@/shared/components';
+import { Navbar, Card, AnimatedSection, Footer, AnnouncementBanner } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
 
 // Tipos TypeScript
@@ -107,6 +107,7 @@ export function CapacitacionIAClient() {
       {/* AI Context: Esta página implementa Pilar 1 - Capacitación IA por rol */}
       
       <Navbar />
+      <AnnouncementBanner />
       
       <main>
         {/* Hero Section */}

@@ -15,7 +15,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Mail, Building2, Send, Loader2, CheckCircle } from 'lucide-react';
-import { Navbar, AnimatedSection, Card, Button, Footer } from '@/shared/components';
+import { Navbar, AnimatedSection, Card, Button, Footer, AnnouncementBanner } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
 
 // Tipos TypeScript
@@ -216,6 +216,7 @@ export const ContactoClient: React.FC = () => {
       {/* AI Context: Documentación específica - ../../../docs/reference/CONTACTO-PAGE.md */}
       
       <Navbar />
+      <AnnouncementBanner />
       
       <main>
         {/* Hero Section */}

@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { GraduationCap, BookOpen, Clock, Download } from 'lucide-react';
-import { Navbar, AnimatedSection, Card, Footer } from '@/shared/components';
+import { Navbar, AnimatedSection, Card, Footer, AnnouncementBanner } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
 
 // Tipos TypeScript
@@ -102,6 +102,7 @@ export function RecursosClient() {
       {/* AI Context: Esta página implementa AI Academy con cursos, guías y biblioteca de prompts */}
       
       <Navbar />
+      <AnnouncementBanner />
       
       <main>
         {/* Hero Section - AI Academy */}

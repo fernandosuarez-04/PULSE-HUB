@@ -14,7 +14,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, TrendingUp, DollarSign, CheckCircle, Users } from 'lucide-react';
-import { Navbar, AnimatedSection, Card, Footer } from '@/shared/components';
+import { Navbar, AnimatedSection, Card, Footer, AnnouncementBanner } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
 
 // Tipos TypeScript
@@ -119,6 +119,7 @@ export function CasosDeExitoClient() {
       {/* AI Context: Esta página muestra casos de éxito con filtros por industria y pilar */}
       
       <Navbar />
+      <AnnouncementBanner />
       
       <main>
         {/* Hero Section */}
@@ -322,7 +323,7 @@ export function CasosDeExitoClient() {
         {/* CTA Final */}
         <section className="py-12 md:py-16 bg-white text-center">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-            <AnimatedSection animationType="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--neutral-900)] mb-6">
                 ¿Quieres tu propio caso de éxito?
               </h2>

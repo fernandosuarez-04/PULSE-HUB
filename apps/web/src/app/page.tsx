@@ -21,7 +21,7 @@ import {
   Search, Palette, Rocket, ChevronLeft, ChevronRight,
   Mail, Linkedin
 } from 'lucide-react';
-import { Button, Card, WavesSVG, Navbar, ParticlesBackground, AnimatedSection } from '@/shared/components';
+import { Button, Card, WavesSVG, Navbar, ParticlesBackground, AnimatedSection, AnnouncementBanner, Footer } from '@/shared/components';
 
 // Note: AnimatedSection is now imported from shared components
 
@@ -97,6 +97,7 @@ export default function Home() {
       {/* AI Context: Esta página implementa la Homepage principal con Hero, Tres Pilares, Resultados y Testimonios */}
       
       <Navbar />
+      <AnnouncementBanner />
       <main className="overflow-hidden">
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center 
@@ -504,99 +505,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="bg-[var(--neutral-900)] text-white py-12 border-t border-white/10">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
-              {/* Logo & Description */}
-              <div className="md:col-span-1">
-                <div className="mb-4">
-                  <Image
-                    src="/pulse-hub-logo.png"
-                    alt="Pulse Hub Logo"
-                    width={150}
-                    height={35}
-                    className="h-8 w-auto brightness-0 invert"
-                  />
-                </div>
-                <p className="text-sm text-white/70 leading-relaxed">
-                  Ecosistema humano-tecnológico para la adopción ética y efectiva de IA en empresas.
-                </p>
-              </div>
-
-              {/* Nuestros Pilares */}
-              <div>
-                <h4 className="font-semibold mb-4">Nuestros Pilares</h4>
-                <ul className="space-y-2">
-                  {['Capacitación IA', 'Adopción Diaria', 'Automatización'].map((item) => (
-                    <li key={item}>
-                      <a href="#" className="text-sm text-white/70 hover:text-white transition-colors">
-                        {item}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Recursos */}
-              <div>
-                <h4 className="font-semibold mb-4">Recursos</h4>
-                <ul className="space-y-2">
-                  {['Casos de Éxito', 'AI Academy', 'Sobre Nosotros'].map((item) => (
-                    <li key={item}>
-                      <a href="#" className="text-sm text-white/70 hover:text-white transition-colors">
-                        {item}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Contacto */}
-              <div>
-                <h4 className="font-semibold mb-4">Contacto</h4>
-                <ul className="space-y-2">
-                  <li>
-                    <a href="#" className="text-sm text-white/70 hover:text-white transition-colors">
-                      Agendar Demo
-                    </a>
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-white/70">
-                    <Mail size={16} />
-                    contacto@pulsehub.com
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
-                    >
-                      <Linkedin size={16} />
-                      LinkedIn
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-white/60">
-                © 2025 Pulse Hub. Todos los derechos reservados.
-              </p>
-              <div className="flex gap-6">
-                {['Privacidad', 'Términos', 'Cookies'].map((item) => (
-                  <a
-                    key={item}
-                    href="#"
-                    className="text-sm text-white/60 hover:text-white transition-colors"
-                  >
-                    {item}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </main>
     </>
   );
