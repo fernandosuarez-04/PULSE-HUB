@@ -81,9 +81,11 @@ const Navbar: React.FC = () => {
 
           {/* CTA Button */}
           <div className="hidden lg:block">
-            <Button variant="primary" size="md">
-              Agendar Demo
-            </Button>
+            <Link href="/contacto">
+              <Button variant="primary" size="md">
+                Agendar Demo
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -127,9 +129,11 @@ const Navbar: React.FC = () => {
                 );
               })}
               <div className="pt-2">
-                <Button variant="primary" size="md" className="w-full">
-                  Agendar Demo
-                </Button>
+                <Link href="/contacto" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="primary" size="md" className="w-full">
+                    Agendar Demo
+                  </Button>
+                </Link>
               </div>
             </div>
           </motion.div>

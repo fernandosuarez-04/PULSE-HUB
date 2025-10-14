@@ -4,4 +4,5 @@ export * from './WavesSVG';
 export * from './Navbar';
 export * from './ParticlesBackground';
 export * from './AnimatedSection';
+export * from './Footer';
 

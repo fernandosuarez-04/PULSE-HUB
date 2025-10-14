@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Sparkles, Target, TrendingUp, Shield } from 'lucide-react';
-import { Navbar, Card, AnimatedSection, Button } from '@/shared/components';
-import Footer from '@/shared/components/Footer/Footer';
+import { Navbar, Card, AnimatedSection, Button, Footer } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
 
 // Tipos TypeScript
@@ -318,72 +317,7 @@ export function AutomatizacionClient() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="bg-[var(--neutral-900)] text-white py-16">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
-              {/* Logo y descripción */}
-              <div className="md:col-span-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-[var(--primary-600)] rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">PH</span>
-                  </div>
-                  <span className="text-xl font-bold">Pulse Hub</span>
-                </div>
-                <p className="text-[var(--neutral-200)] text-sm leading-relaxed">
-                  Ecosistema humano-tecnológico para la adopción ética y efectiva de IA en empresas.
-                </p>
-              </div>
-
-              {/* Nuestros Pilares */}
-              <div>
-                <h3 className="font-semibold mb-4">Nuestros Pilares</h3>
-                <ul className="space-y-2 text-sm text-[var(--neutral-200)]">
-                  <li><a href="/capacitacion-ia" className="hover:text-white transition-colors">Capacitación IA</a></li>
-                  <li><a href="/adopcion-diaria" className="hover:text-white transition-colors">Adopción Diaria</a></li>
-                  <li><a href="/automatizacion" className="hover:text-white transition-colors">Automatización</a></li>
-                </ul>
-              </div>
-
-              {/* Recursos */}
-              <div>
-                <h3 className="font-semibold mb-4">Recursos</h3>
-                <ul className="space-y-2 text-sm text-[var(--neutral-200)]">
-                  <li><a href="/casos-de-exito" className="hover:text-white transition-colors">Casos de Éxito</a></li>
-                  <li><a href="/recursos" className="hover:text-white transition-colors">AI Academy</a></li>
-                  <li><a href="/sobre" className="hover:text-white transition-colors">Sobre Nosotros</a></li>
-                </ul>
-              </div>
-
-              {/* Contacto */}
-              <div>
-                <h3 className="font-semibold mb-4">Contacto</h3>
-                <ul className="space-y-2 text-sm text-[var(--neutral-200)]">
-                  <li><a href="/contacto" className="hover:text-white transition-colors">Agendar Demo</a></li>
-                  <li><a href="mailto:contacto@pulsehub.com" className="hover:text-white transition-colors">contacto@pulsehub.com</a></li>
-                  <li>
-                    <a href="https://linkedin.com/company/pulsehub" target="_blank" rel="noopener noreferrer" 
-                       className="hover:text-white transition-colors flex items-center gap-2">
-                      <span>LinkedIn</span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Bottom bar */}
-            <div className="border-t border-[var(--neutral-700)] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-[var(--neutral-200)]">
-                © 2025 Pulse Hub. Todos los derechos reservados.
-              </p>
-              <div className="flex gap-6 text-sm text-[var(--neutral-200)]">
-                <a href="/privacidad" className="hover:text-white transition-colors">Privacidad</a>
-                <a href="/terminos" className="hover:text-white transition-colors">Términos</a>
-                <a href="/cookies" className="hover:text-white transition-colors">Cookies</a>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </main>
     </>
   );
