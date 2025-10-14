@@ -3,9 +3,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
 import { errorHandler } from './core/middleware/errorHandler';
 import { authRoutes } from './features/auth/auth.routes';
 import { userRoutes } from './features/users/users.routes';
+import { AIChatService } from './features/ai-chat';
+import type { ClientMessage, ServerMessage } from './features/ai-chat';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -49,9 +53,96 @@ app.use((_req, res) => {
   });
 });
 
+// Create HTTP server for WebSocket
+const server = createServer(app);
+
+// Initialize WebSocket Server
+const wss = new WebSocketServer({ server, path: '/ws/chat' });
+
+// Map to store AI Chat Service instances per connection
+const chatInstances = new Map<WebSocket, AIChatService>();
+
+console.log('🔌 Initializing WebSocket Server for AI Chat...');
+
+wss.on('connection', (ws: WebSocket) => {
+  console.log('👤 New WebSocket client connected');
+
+  // Create a new AI Chat Service instance for this connection
+  const chatService = new AIChatService();
+  chatInstances.set(ws, chatService);
+
+  // Send connection established message
+  const welcomeMessage: ServerMessage = {
+    type: 'connection_established',
+    text: '¡Conectado! Escribe tu pregunta sobre estrategias de IA empresarial.',
+    sessionId: chatService.getSessionId(),
+  };
+  ws.send(JSON.stringify(welcomeMessage));
+
+  // Handle incoming messages
+  ws.on('message', async (data: Buffer) => {
+    try {
+      const clientMessage: ClientMessage = JSON.parse(data.toString());
+
+      if (clientMessage.type === 'user_message') {
+        console.log(`📩 Received message: "${clientMessage.text}"`);
+
+        // Send typing indicator
+        const typingMessage: ServerMessage = {
+          type: 'typing',
+        };
+        ws.send(JSON.stringify(typingMessage));
+
+        // Process message with AI Chat Service
+        const chatService = chatInstances.get(ws);
+        if (!chatService) {
+          throw new Error('Chat service not found for connection');
+        }
+
+        const response = await chatService.handleMessage(clientMessage.text);
+
+        // Send agent response
+        const agentMessage: ServerMessage = {
+          type: 'agent_message',
+          text: response,
+        };
+        ws.send(JSON.stringify(agentMessage));
+
+        console.log(`📤 Sent response: "${response.substring(0, 50)}..."`);
+      }
+    } catch (error) {
+      console.error('❌ Error processing message:', error);
+
+      // Send error message to client
+      const errorMessage: ServerMessage = {
+        type: 'error',
+        error:
+          'Ocurrió un error al procesar tu mensaje. Por favor, intenta de nuevo.',
+      };
+      ws.send(JSON.stringify(errorMessage));
+    }
+  });
+
+  // Handle disconnection
+  ws.on('close', () => {
+    console.log('👋 WebSocket client disconnected');
+    const chatService = chatInstances.get(ws);
+    if (chatService) {
+      chatService.clearHistory();
+      chatInstances.delete(ws);
+    }
+  });
+
+  // Handle errors
+  ws.on('error', (error) => {
+    console.error('❌ WebSocket error:', error);
+  });
+});
+
 // Iniciar servidor
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🔌 WebSocket disponible en ws://localhost:${PORT}/ws/chat`);
   console.log(`📚 API Version: ${API_VERSION}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

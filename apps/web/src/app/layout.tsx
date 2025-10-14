@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { AIChat } from "@/shared/components";
 import "./globals.css";
 
 const inter = Inter({
@@ -36,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      {/* 
+      {/*
         Documentación de Contexto para Asistentes IA:
         - Estrategia de Adopción IA: ../../docs/product/ESTRATEGIA-ADOPCION-IA.md
         - PRD Completo: ../../docs/product/PRD-PULSE-HUB.md
@@ -45,6 +46,7 @@ export default function RootLayout({
       */}
       <body className={`${inter.variable} antialiased`}>
         {children}
+        <AIChat />
       </body>
     </html>
   );
