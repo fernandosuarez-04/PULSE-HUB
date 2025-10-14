@@ -1,0 +1,30 @@
+# Variables de entorno necesarias para el agente
+
+# ========================================
+# OpenAI Configuration (REQUERIDO)
+# ========================================
+# El agente usa OpenAI GPT-4o-mini para comprensión inteligente y generación de respuestas
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4o-mini
+OPENAI_MAX_TOKENS=1000
+
+# Obtén tu API key de OpenAI en: https://platform.openai.com/api-keys
+
+# ========================================
+# Coda API Configuration (REQUERIDO)
+# ========================================
+# El agente consulta información desde una tabla de Coda sobre estrategias de IA
+CODA_API_KEY=your_coda_api_key_here
+CODA_DOC_ID=your_doc_id_here
+CODA_TABLE_ID=your_table_id_here
+
+# Obtén tu API key de Coda en: https://coda.io/account
+
+# ========================================
+# Notas Importantes
+# ========================================
+# - OpenAI API Key es REQUERIDO para el funcionamiento del agente
+# - Coda API es REQUERIDO como fuente de información
+# - El modelo por defecto es gpt-4o-mini (económico y eficiente)
+# - Puedes ajustar OPENAI_MAX_TOKENS según tus necesidades (500-2000)
+# - Todas las respuestas se basan en el contenido de Coda procesado por OpenAI

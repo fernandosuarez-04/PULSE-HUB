@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run evals:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run evals:tone:*)",
+      "Bash(npm run evals:latency:*)",
+      "Bash(npm run tracing:demo:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

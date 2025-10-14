@@ -1,0 +1,240 @@
+{
+  "sessionId": "session-exploracion",
+  "startTime": "2025-10-08T18:34:59.573Z",
+  "events": [
+    {
+      "timestamp": "2025-10-08T18:34:59.573Z",
+      "type": "input",
+      "data": {
+        "message": "Buenos días"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:34:59.573Z",
+      "type": "intent",
+      "data": {
+        "intent": "greeting"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:34:59.573Z",
+      "type": "output",
+      "data": {
+        "message": "¡Hola! Bienvenido. Soy un agente conversacional y estoy aquí para ayudarte. Puedes preguntarme sobre el clima o simplemente platicar conmigo.",
+        "latency": 0
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:34:59.974Z",
+      "type": "input",
+      "data": {
+        "message": "¿Qué puedes hacer?"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:34:59.974Z",
+      "type": "intent",
+      "data": {
+        "intent": "conversation"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:34:59.974Z",
+      "type": "output",
+      "data": {
+        "message": "Interesante pregunta. Mi especialidad es el clima, así que si necesitas información meteorológica, estaré encantado de ayudarte.",
+        "latency": 0
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:00.377Z",
+      "type": "input",
+      "data": {
+        "message": "¿Puedes ayudarme con el clima?"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:00.377Z",
+      "type": "intent",
+      "data": {
+        "intent": "conversation"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:00.377Z",
+      "type": "output",
+      "data": {
+        "message": "Buena pregunta. Aunque no tengo toda la información sobre eso, puedo ayudarte con consultas sobre el clima de diferentes ciudades.",
+        "latency": 0
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:00.781Z",
+      "type": "input",
+      "data": {
+        "message": "¿Cómo está el clima en New York?"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:00.781Z",
+      "type": "intent",
+      "data": {
+        "intent": "weather_query",
+        "confidence": 1
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:00.781Z",
+      "type": "error",
+      "data": {
+        "error": "Falta OPENWEATHER_API_KEY",
+        "stack": "Error: Falta OPENWEATHER_API_KEY\n    at getWeather (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\tools\\weather.ts:15:22)\n    at RealtimeAgent.handleMessage (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\agent.ts:31:30)\n    at SessionGenerator.sendMessage (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\tracing\\session-generator.ts:102:39)\n    at SessionGenerator.runSession3 (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\tracing\\session-generator.ts:92:18)\n    at SessionGenerator.generateTestSessions (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\tracing\\session-generator.ts:24:5)\n    at main (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\tracing-demo.ts:14:3)",
+        "context": {
+          "city": "new york"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:00.781Z",
+      "type": "output",
+      "data": {
+        "message": "Lo siento, no pude obtener la información del clima en este momento. ¿Hay algo más en lo que pueda ayudarte?",
+        "latency": 0
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:01.183Z",
+      "type": "input",
+      "data": {
+        "message": "¿Y la temperatura en Miami?"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:01.183Z",
+      "type": "intent",
+      "data": {
+        "intent": "weather_query",
+        "confidence": 1
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:01.183Z",
+      "type": "error",
+      "data": {
+        "error": "Falta OPENWEATHER_API_KEY",
+        "stack": "Error: Falta OPENWEATHER_API_KEY\n    at getWeather (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\tools\\weather.ts:15:22)\n    at RealtimeAgent.handleMessage (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\agent.ts:31:30)\n    at SessionGenerator.sendMessage (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\tracing\\session-generator.ts:102:39)\n    at SessionGenerator.runSession3 (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\tracing\\session-generator.ts:92:18)\n    at SessionGenerator.generateTestSessions (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\server\\tracing\\session-generator.ts:24:5)\n    at main (d:\\EcosDeLiderazgo\\ProyectosEcosDeLiderazgo\\En Desarrollo\\Agente-IA\\tracing-demo.ts:14:3)",
+        "context": {
+          "city": "miami"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:01.183Z",
+      "type": "output",
+      "data": {
+        "message": "Lo siento, no pude obtener la información del clima en este momento. ¿Hay algo más en lo que pueda ayudarte?",
+        "latency": 0
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:01.599Z",
+      "type": "input",
+      "data": {
+        "message": "Perfecto, muchas gracias"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:01.599Z",
+      "type": "intent",
+      "data": {
+        "intent": "conversation"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:01.599Z",
+      "type": "output",
+      "data": {
+        "message": "¡Gracias! Me alegra saber que te he sido útil. ¿Te interesa saber sobre el clima de alguna ciudad?",
+        "latency": 0
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.001Z",
+      "type": "input",
+      "data": {
+        "message": "¿Puedes recordar mi nombre?"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.001Z",
+      "type": "intent",
+      "data": {
+        "intent": "conversation"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.001Z",
+      "type": "output",
+      "data": {
+        "message": "Buena pregunta. Aunque no tengo toda la información sobre eso, puedo ayudarte con consultas sobre el clima de diferentes ciudades.",
+        "latency": 0
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.404Z",
+      "type": "input",
+      "data": {
+        "message": "Me llamo María"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.404Z",
+      "type": "intent",
+      "data": {
+        "intent": "conversation"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.404Z",
+      "type": "output",
+      "data": {
+        "message": "Gracias por compartir eso conmigo. ¿Hay algo más en lo que pueda asistirte?",
+        "latency": 0
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.805Z",
+      "type": "input",
+      "data": {
+        "message": "Ok, adiós"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.805Z",
+      "type": "intent",
+      "data": {
+        "intent": "conversation"
+      }
+    },
+    {
+      "timestamp": "2025-10-08T18:35:02.805Z",
+      "type": "output",
+      "data": {
+        "message": "¡Adiós! Me da gusto haber podido ayudarte. Vuelve pronto para otra charla.",
+        "latency": 0
+      }
+    }
+  ],
+  "metadata": {
+    "totalMessages": 9,
+    "totalErrors": 2,
+    "averageLatency": 0,
+    "intents": [
+      "greeting",
+      "conversation",
+      "weather_query"
+    ],
+    "toolsCalled": []
+  },
+  "endTime": "2025-10-08T18:35:03.209Z"
+}

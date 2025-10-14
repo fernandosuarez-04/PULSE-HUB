@@ -1,0 +1,37 @@
+{
+  "name": "realtime-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Agente conversacional de IA con reconocimiento de voz que consulta estrategias desde Coda",
+  "main": "server/main.ts",
+  "scripts": {
+    "dev": "tsx server/main.ts",
+    "build": "tsc",
+    "start": "tsx server/main.ts",
+    "evals": "tsx evals/run-evals.ts all",
+    "evals:accuracy": "tsx evals/run-evals.ts accuracy",
+    "evals:tone": "tsx evals/run-evals.ts tone",
+    "evals:latency": "tsx evals/run-evals.ts latency",
+    "evals:all": "tsx evals/run-evals.ts all",
+    "tracing:demo": "tsx tracing-demo.ts",
+    "tracing:generate": "tsx server/tracing/session-generator.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.77.3",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/node": "^20.19.19",
+    "@types/ws": "^8.5.6",
+    "cross-env": "^7.0.3",
+    "tsx": "^4.20.6",
+    "typescript": "^5.2.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

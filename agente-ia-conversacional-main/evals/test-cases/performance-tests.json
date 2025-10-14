@@ -1,0 +1,62 @@
+[
+  {
+    "description": "Respuesta rápida - saludo simple",
+    "input": "Hola",
+    "expectedMaxTime": 1000,
+    "category": "fast_response"
+  },
+  {
+    "description": "Consulta de clima - ciudad conocida",
+    "input": "¿Cómo está el clima en Madrid?",
+    "expectedMaxTime": 3000,
+    "category": "weather_api"
+  },
+  {
+    "description": "Pregunta compleja",
+    "input": "¿Qué puedes hacer por mí?",
+    "expectedMaxTime": 1500,
+    "category": "complex_question"
+  },
+  {
+    "description": "Múltiples palabras - ciudad con espacios",
+    "input": "¿Cómo está el clima en Buenos Aires?",
+    "expectedMaxTime": 3000,
+    "category": "multiword_city"
+  },
+  {
+    "description": "Texto largo",
+    "input": "Hola, me gustaría saber cómo está el clima en París porque voy a viajar mañana",
+    "expectedMaxTime": 3000,
+    "category": "long_input"
+  },
+  {
+    "description": "Consulta con caracteres especiales",
+    "input": "¿Cómo está el clima en Ciudad de México?",
+    "expectedMaxTime": 3000,
+    "category": "special_chars"
+  },
+  {
+    "description": "Pregunta sobre capacidades",
+    "input": "¿Puedes ayudarme con información del clima?",
+    "expectedMaxTime": 1500,
+    "category": "capability_question"
+  },
+  {
+    "description": "Agradecimiento",
+    "input": "Muchas gracias por tu ayuda",
+    "expectedMaxTime": 1000,
+    "category": "gratitude"
+  },
+  {
+    "description": "Consulta repetitiva",
+    "input": "Clima Madrid",
+    "expectedMaxTime": 3000,
+    "category": "minimal_input"
+  },
+  {
+    "description": "Despedida",
+    "input": "Hasta luego, nos vemos pronto",
+    "expectedMaxTime": 1000,
+    "category": "farewell"
+  }
+]

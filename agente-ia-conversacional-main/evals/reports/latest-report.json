@@ -1,0 +1,599 @@
+{
+  "overall": {
+    "score": 286,
+    "maxScore": 320,
+    "percentage": 89.375
+  },
+  "metrics": [
+    {
+      "metric": "accuracy",
+      "score": 86,
+      "maxScore": 100,
+      "percentage": 86,
+      "details": [
+        {
+          "testCase": "Consulta básica de clima en Madrid",
+          "input": "¿Cómo está el clima en Madrid?",
+          "expectedCity": "Madrid",
+          "response": "¡Hola! Bienvenido. Soy un agente conversacional y estoy aquí para ayudarte. Puedes preguntarme sobre el clima o simplemente platicar conmigo.",
+          "responseTime": 0,
+          "score": 6,
+          "maxScore": 10,
+          "checks": [
+            "❌ Ciudad no mencionada o incorrecta",
+            "✅ Información meteorológica presente",
+            "❌ Formato de temperatura incorrecto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": false
+        },
+        {
+          "testCase": "Consulta de tiempo en Barcelona",
+          "input": "¿Qué tiempo hace en Barcelona?",
+          "expectedCity": "Barcelona",
+          "response": "En barcelona está nubes dispersas con 23.9°C.",
+          "responseTime": 323,
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Ciudad mencionada correctamente",
+            "✅ Información meteorológica presente",
+            "✅ Formato de temperatura correcto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Consulta con ciudad con acentos",
+          "input": "¿Cómo está el clima en Ciudad de México?",
+          "expectedCity": "Ciudad de México",
+          "response": "En méxico está lluvia moderada con 14.97°C.",
+          "responseTime": 82,
+          "score": 8,
+          "maxScore": 10,
+          "checks": [
+            "❌ Ciudad no mencionada o incorrecta",
+            "✅ Información meteorológica presente",
+            "✅ Formato de temperatura correcto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Consulta informal de temperatura",
+          "input": "¿Cuántos grados hace en París?",
+          "expectedCity": "París",
+          "response": "Interesante pregunta. Mi especialidad es el clima, así que si necesitas información meteorológica, estaré encantado de ayudarte.",
+          "responseTime": 0,
+          "score": 6,
+          "maxScore": 10,
+          "checks": [
+            "❌ Ciudad no mencionada o incorrecta",
+            "✅ Información meteorológica presente",
+            "❌ Formato de temperatura incorrecto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": false
+        },
+        {
+          "testCase": "Consulta con preposición 'de'",
+          "input": "Necesito saber el clima de Londres",
+          "expectedCity": "Londres",
+          "response": "En londres está muy nuboso con 17.3°C.",
+          "responseTime": 86,
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Ciudad mencionada correctamente",
+            "✅ Información meteorológica presente",
+            "✅ Formato de temperatura correcto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Consulta con ciudad en inglés",
+          "input": "¿Cómo está el clima en New York?",
+          "expectedCity": "New York",
+          "response": "En new york está nubes con 16.89°C.",
+          "responseTime": 94,
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Ciudad mencionada correctamente",
+            "✅ Información meteorológica presente",
+            "✅ Formato de temperatura correcto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Consulta con descripción adicional",
+          "input": "¿Cómo está el clima en la ciudad de Roma?",
+          "expectedCity": "Roma",
+          "response": "En roma está cielo claro con 16.29°C.",
+          "responseTime": 93,
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Ciudad mencionada correctamente",
+            "✅ Información meteorológica presente",
+            "✅ Formato de temperatura correcto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Consulta de lluvia específica",
+          "input": "¿Va a llover en Berlín?",
+          "expectedCity": "Berlín",
+          "response": "Buena pregunta. Aunque no tengo toda la información sobre eso, puedo ayudarte con consultas sobre el clima de diferentes ciudades.",
+          "responseTime": 0,
+          "score": 6,
+          "maxScore": 10,
+          "checks": [
+            "❌ Ciudad no mencionada o incorrecta",
+            "✅ Información meteorológica presente",
+            "❌ Formato de temperatura incorrecto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": false
+        },
+        {
+          "testCase": "Consulta con ciudad pequeña",
+          "input": "¿Qué temperatura hace en Toledo?",
+          "expectedCity": "Toledo",
+          "response": "En toledo está muy nuboso con 25.07°C.",
+          "responseTime": 121,
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Ciudad mencionada correctamente",
+            "✅ Información meteorológica presente",
+            "✅ Formato de temperatura correcto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Consulta con múltiples palabras",
+          "input": "¿Cómo está el clima en Buenos Aires?",
+          "expectedCity": "Buenos Aires",
+          "response": "En buenos aires está cielo claro con 22.87°C.",
+          "responseTime": 79,
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Ciudad mencionada correctamente",
+            "✅ Información meteorológica presente",
+            "✅ Formato de temperatura correcto",
+            "✅ Longitud de respuesta apropiada",
+            "✅ Tiempo de respuesta aceptable"
+          ],
+          "passed": true
+        }
+      ],
+      "timestamp": "2025-10-08T15:54:08.313Z"
+    },
+    {
+      "metric": "tone",
+      "score": 100,
+      "maxScore": 120,
+      "percentage": 83.33333333333334,
+      "details": [
+        {
+          "testCase": "Saludo básico",
+          "input": "Hola",
+          "expectedTone": "greeting",
+          "response": "¡Hola! Bienvenido. Soy un agente conversacional y estoy aquí para ayudarte. Puedes preguntarme sobre el clima o simplemente platicar conmigo.",
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "✅ Tono apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Saludo formal",
+          "input": "Buenos días",
+          "expectedTone": "greeting",
+          "response": "¡Hola! Soy tu asistente de IA. Puedo ayudarte con consultas sobre el clima o simplemente charlar contigo. ¿En qué puedo ayudarte?",
+          "score": 8,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "✅ Tono apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "❌ Estilo inconsistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Saludo informal",
+          "input": "¿Qué tal?",
+          "expectedTone": "greeting",
+          "response": "¡Qué tal! Me alegra verte. Estoy listo para ayudarte con información del clima o para tener una buena conversación. ¿Cómo estás?",
+          "score": 6,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "❌ Tono no apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "❌ Estilo inconsistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": false
+        },
+        {
+          "testCase": "Pregunta sobre el agente",
+          "input": "¿Quién eres?",
+          "expectedTone": "informative",
+          "response": "Buena pregunta. Aunque no tengo toda la información sobre eso, puedo ayudarte con consultas sobre el clima de diferentes ciudades.",
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "✅ Tono apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Pregunta sobre capacidades",
+          "input": "¿Qué puedes hacer?",
+          "expectedTone": "helpful",
+          "response": "Interesante pregunta. Mi especialidad es el clima, así que si necesitas información meteorológica, estaré encantado de ayudarte.",
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "✅ Tono apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Agradecimiento",
+          "input": "Gracias",
+          "expectedTone": "polite",
+          "response": "¡Gracias! Me alegra saber que te he sido útil. ¿Te interesa saber sobre el clima de alguna ciudad?",
+          "score": 8,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "✅ Tono apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "❌ Estilo inconsistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Despedida",
+          "input": "Adiós",
+          "expectedTone": "polite",
+          "response": "¡Adiós! Me da gusto haber podido ayudarte. Vuelve pronto para otra charla.",
+          "score": 8,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "❌ Tono no apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Pregunta general",
+          "input": "¿Cómo estás?",
+          "expectedTone": "greeting",
+          "response": "Buena pregunta. Aunque no tengo toda la información sobre eso, puedo ayudarte con consultas sobre el clima de diferentes ciudades.",
+          "score": 8,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "❌ Tono no apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Solicitud de ayuda",
+          "input": "¿Puedes ayudarme?",
+          "expectedTone": "helpful",
+          "response": "Buena pregunta. Aunque no tengo toda la información sobre eso, puedo ayudarte con consultas sobre el clima de diferentes ciudades.",
+          "score": 10,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "✅ Tono apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Comentario positivo",
+          "input": "Excelente trabajo",
+          "expectedTone": "polite",
+          "response": "¡De nada! Es un placer ayudarte. Si necesitas información del clima, no dudes en preguntarme.",
+          "score": 8,
+          "maxScore": 10,
+          "checks": [
+            "✅ Respuesta amigable",
+            "❌ Tono no apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": true
+        },
+        {
+          "testCase": "Pregunta sobre clima sin ciudad",
+          "input": "¿Cómo está el clima?",
+          "expectedTone": "helpful",
+          "response": "Me gusta tu curiosidad. Si tienes preguntas sobre el clima de alguna ciudad, puedo darte información actualizada.",
+          "score": 7,
+          "maxScore": 10,
+          "checks": [
+            "❌ Respuesta no suficientemente amigable",
+            "✅ Tono apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": false
+        },
+        {
+          "testCase": "Consulta no relacionada",
+          "input": "¿Qué hora es?",
+          "expectedTone": "helpful",
+          "response": "Me gusta tu curiosidad. Si tienes preguntas sobre el clima de alguna ciudad, puedo darte información actualizada.",
+          "score": 7,
+          "maxScore": 10,
+          "checks": [
+            "❌ Respuesta no suficientemente amigable",
+            "✅ Tono apropiado para el contexto",
+            "✅ Sin tono negativo",
+            "✅ Estilo consistente",
+            "✅ Respuesta útil"
+          ],
+          "passed": false
+        }
+      ],
+      "timestamp": "2025-10-08T15:54:08.315Z"
+    },
+    {
+      "metric": "latency",
+      "score": 100,
+      "maxScore": 100,
+      "percentage": 100,
+      "details": {
+        "results": [
+          {
+            "testCase": "Respuesta rápida - saludo simple",
+            "input": "Hola",
+            "responseTime": 0,
+            "individualTimes": [
+              0,
+              0,
+              0
+            ],
+            "maxDeviation": 0,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Consulta de clima - ciudad conocida",
+            "input": "¿Cómo está el clima en Madrid?",
+            "responseTime": 78,
+            "individualTimes": [
+              77,
+              76,
+              81
+            ],
+            "maxDeviation": 5,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Pregunta compleja",
+            "input": "¿Qué puedes hacer por mí?",
+            "responseTime": 0,
+            "individualTimes": [
+              0,
+              0,
+              0
+            ],
+            "maxDeviation": 0,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Múltiples palabras - ciudad con espacios",
+            "input": "¿Cómo está el clima en Buenos Aires?",
+            "responseTime": 87,
+            "individualTimes": [
+              91,
+              74,
+              97
+            ],
+            "maxDeviation": 23,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Texto largo",
+            "input": "Hola, me gustaría saber cómo está el clima en París porque voy a viajar mañana",
+            "responseTime": 0,
+            "individualTimes": [
+              0,
+              0,
+              0
+            ],
+            "maxDeviation": 0,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Consulta con caracteres especiales",
+            "input": "¿Cómo está el clima en Ciudad de México?",
+            "responseTime": 89,
+            "individualTimes": [
+              110,
+              77,
+              80
+            ],
+            "maxDeviation": 33,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Pregunta sobre capacidades",
+            "input": "¿Puedes ayudarme con información del clima?",
+            "responseTime": 0,
+            "individualTimes": [
+              0,
+              0,
+              0
+            ],
+            "maxDeviation": 0,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Agradecimiento",
+            "input": "Muchas gracias por tu ayuda",
+            "responseTime": 0,
+            "individualTimes": [
+              0,
+              0,
+              0
+            ],
+            "maxDeviation": 0,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Consulta repetitiva",
+            "input": "Clima Madrid",
+            "responseTime": 0,
+            "individualTimes": [
+              0,
+              0,
+              0
+            ],
+            "maxDeviation": 0,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          },
+          {
+            "testCase": "Despedida",
+            "input": "Hasta luego, nos vemos pronto",
+            "responseTime": 0,
+            "individualTimes": [
+              0,
+              0,
+              0
+            ],
+            "maxDeviation": 0,
+            "score": 10,
+            "maxScore": 10,
+            "checks": [
+              "✅ Tiempo de respuesta excelente (< 500ms)",
+              "✅ Consistencia excelente en tiempos",
+              "✅ Sin errores de timeout"
+            ],
+            "passed": true
+          }
+        ],
+        "statistics": {
+          "averageResponseTime": 85,
+          "maxResponseTime": 89,
+          "minResponseTime": 78,
+          "totalTests": 10,
+          "passedTests": 10
+        }
+      },
+      "timestamp": "2025-10-08T15:54:12.358Z"
+    }
+  ],
+  "summary": "Buen rendimiento. 3/3 métricas superaron el 80%. Se recomiendan mejoras menores.",
+  "timestamp": "2025-10-08T15:54:12.358Z"
+}

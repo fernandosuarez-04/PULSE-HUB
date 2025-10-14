@@ -1,0 +1,35 @@
+{
+  "evaluation": {
+    "passingThreshold": 75,
+    "excellentThreshold": 90,
+    "maxRetries": 3,
+    "timeoutMs": 10000
+  },
+  "metrics": {
+    "accuracy": {
+      "weight": 40,
+      "requiredTests": ["weather_basic", "weather_special_chars"],
+      "maxResponseTime": 3000
+    },
+    "tone": {
+      "weight": 30,
+      "requiredTests": ["greeting", "helpful", "polite"],
+      "minResponseLength": 10
+    },
+    "latency": {
+      "weight": 30,
+      "maxAverageTime": 1500,
+      "maxDeviation": 500
+    }
+  },
+  "reporting": {
+    "saveIndividualResults": true,
+    "generateMarkdown": true,
+    "includeDetails": true
+  },
+  "ci": {
+    "failOnLowScore": true,
+    "commentOnPR": true,
+    "uploadArtifacts": true
+  }
+}
