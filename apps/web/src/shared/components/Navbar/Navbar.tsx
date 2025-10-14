@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { href: '/', label: 'Inicio' },
     { href: '/sobre', label: 'Sobre Pulse Hub' },
-    { href: '/capacitacion', label: 'Capacitación IA' },
+    { href: '/capacitacion-ia', label: 'Capacitación IA' },
     { href: '/adopcion', label: 'Adopción Diaria' },
     { href: '/automatizacion', label: 'Automatización' },
     { href: '/casos', label: 'Casos de Éxito' },
