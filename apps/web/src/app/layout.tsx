@@ -9,9 +9,17 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Pulse Hub: Adopción de IA ética y efectiva",
+  title: "Pulse Hub",
   description: "Tres pilares para capacitar, adoptar y automatizar con ROI medible y cumplimiento. Ecosistema humano-tecnológico para acelerar la adopción de IA en empresas.",
   keywords: ["adopción IA", "inteligencia artificial empresas", "capacitación IA", "automatización responsable", "ROI IA"],
+  icons: {
+    icon: [
+      { url: '/icono.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icono.png', sizes: '16x16', type: 'image/png' }
+    ],
+    shortcut: '/icono.png',
+    apple: '/icono.png',
+  },
 };
 
 export default function RootLayout({

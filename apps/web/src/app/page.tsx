@@ -9,25 +9,9 @@ import {
   Search, Palette, Rocket, ChevronLeft, ChevronRight,
   Mail, Linkedin
 } from 'lucide-react';
-import { Button, Card, WavesSVG, Navbar } from '@/shared/components';
+import { Button, Card, WavesSVG, Navbar, ParticlesBackground, AnimatedSection } from '@/shared/components';
 
-// AnimatedSection Component
-const AnimatedSection = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => {
-  const ref = React.useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-};
+// Note: AnimatedSection is now imported from shared components
 
 // Counter Animation Component
 const CounterAnimation = ({ target, suffix = '', prefix = '' }: { target: number; suffix?: string; prefix?: string }) => {
@@ -98,8 +82,19 @@ export default function Home() {
       <Navbar />
       <main className="overflow-hidden">
         {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#f5f8ff] to-white pt-20">
-          <WavesSVG className="opacity-50" />
+        <section className="relative min-h-screen flex items-center justify-center 
+          bg-gradient-to-br from-[#f5f8ff] via-[#fefeff] via-50% to-[#f0f5ff] 
+          pt-20 overflow-hidden">
+          
+          {/* Gradiente radial adicional para profundidad */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] 
+            from-[var(--primary-100)]/30 via-transparent to-transparent opacity-50" />
+          
+          {/* Patrón de puntos */}
+          <ParticlesBackground particleCount={60} />
+          
+          {/* Ondas mejoradas */}
+          <WavesSVG className="opacity-70" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <motion.div
@@ -108,9 +103,13 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              {/* Badge */}
+              {/* Badge con efecto glassmorphism */}
               <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-white rounded-full shadow-[var(--shadow-base)] border border-[var(--neutral-200)]"
+                className="inline-flex items-center gap-2 px-4 py-2 mb-8 
+                  bg-white/70 backdrop-blur-md rounded-full 
+                  shadow-[0_8px_32px_rgba(31,90,246,0.1)] 
+                  border border-white/40
+                  ring-1 ring-[var(--primary-600)]/10"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}

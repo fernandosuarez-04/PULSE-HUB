@@ -67,6 +67,20 @@
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  
+  /* Gradientes adicionales para fondos */
+  --gradient-hero: linear-gradient(135deg, #f5f8ff 0%, #fefeff 50%, #f0f5ff 100%);
+  --gradient-radial: radial-gradient(ellipse at top right, rgba(232, 239, 253, 0.3), transparent);
+  
+  /* Blur levels para glassmorphism */
+  --blur-sm: 8px;
+  --blur-md: 12px;
+  --blur-lg: 16px;
+  
+  /* Colores con opacidad para overlays */
+  --primary-100-alpha-30: rgba(232, 239, 253, 0.3);
+  --white-alpha-60: rgba(255, 255, 255, 0.6);
+  --white-alpha-70: rgba(255, 255, 255, 0.7);
 }
 
 @theme inline {
@@ -101,6 +115,26 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
+/* Animaciones para botones */
+@keyframes shimmer {
+  0% { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(100%) skewX(-12deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Soporte para will-change en botones */
+button {
+  will-change: transform;
+}
+
+button:hover {
+  will-change: transform, box-shadow;
+}
+
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -109,5 +143,10 @@ h1, h2, h3, h4, h5, h6 {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  
+  /* Desactivar will-change para reduced motion */
+  button {
+    will-change: auto !important;
   }
 }
