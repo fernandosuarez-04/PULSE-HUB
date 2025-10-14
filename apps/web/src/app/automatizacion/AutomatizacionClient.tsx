@@ -1,3 +1,14 @@
+/**
+ * Componente: AutomatizacionClient - Pilar 3
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * 
+ * Implementa: Pilar 3 - Automatización de Alto Impacto con matriz y gobernanza
+ */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -131,6 +142,10 @@ const CounterAnimation = ({ target, suffix = '', prefix = '' }: {
 export function AutomatizacionClient() {
   return (
     <>
+      {/* AI Context: Estrategia de Adopción IA - ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md */}
+      {/* AI Context: PRD Pulse Hub - ../../../docs/product/PRD-PULSE-HUB.md */}
+      {/* AI Context: Esta página implementa Pilar 3 - Automatización con matriz impacto-esfuerzo */}
+      
       <Navbar />
       
       <main>

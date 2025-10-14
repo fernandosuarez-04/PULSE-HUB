@@ -1,3 +1,15 @@
+/**
+ * Página: Sobre Pulse Hub
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * - Arquitectura: ../../docs/reference/ARCHITECTURE.md
+ * 
+ * Esta página implementa: Manifiesto, Valores y Metodología "Ecos" de Pulse Hub
+ */
+
 import type { Metadata } from 'next';
 import { Navbar, Card, AnimatedSection, Footer } from '@/shared/components';
 import { Target, Shield, Users, Heart } from 'lucide-react';
@@ -45,6 +57,10 @@ const metodologia = [
 export default function SobrePage() {
   return (
     <>
+      {/* AI Context: Estrategia de Adopción IA - ../../docs/product/ESTRATEGIA-ADOPCION-IA.md */}
+      {/* AI Context: PRD Pulse Hub - ../../docs/product/PRD-PULSE-HUB.md */}
+      {/* AI Context: Esta página presenta el Manifiesto, Valores y Metodología Ecos */}
+      
       <Navbar />
       
       <main>

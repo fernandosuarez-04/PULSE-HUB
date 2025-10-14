@@ -1,3 +1,15 @@
+/**
+ * Componente: ContactoClient - Página de Contacto/Agenda Demo
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * - Documentación específica: ../../../docs/reference/CONTACTO-PAGE.md
+ * 
+ * Implementa: FR-6 del PRD - Formulario de contacto con validación, cards de acción y footer unificado
+ */
+
 'use client';
 
 import React, { useState } from 'react';
@@ -198,6 +210,11 @@ export const ContactoClient: React.FC = () => {
 
   return (
     <>
+      {/* AI Context: Estrategia de Adopción IA - ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md */}
+      {/* AI Context: PRD Pulse Hub - ../../../docs/product/PRD-PULSE-HUB.md */}
+      {/* AI Context: Esta página implementa FR-6 del PRD: Contacto y Agenda de Demos */}
+      {/* AI Context: Documentación específica - ../../../docs/reference/CONTACTO-PAGE.md */}
+      
       <Navbar />
       
       <main>

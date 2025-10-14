@@ -1,3 +1,14 @@
+/**
+ * Componente: CasosDeExitoClient
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * 
+ * Implementa: Casos de éxito con filtros por industria y resultados medibles
+ */
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -103,6 +114,10 @@ export function CasosDeExitoClient() {
 
   return (
     <>
+      {/* AI Context: Estrategia de Adopción IA - ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md */}
+      {/* AI Context: PRD Pulse Hub - ../../../docs/product/PRD-PULSE-HUB.md */}
+      {/* AI Context: Esta página muestra casos de éxito con filtros por industria y pilar */}
+      
       <Navbar />
       
       <main>

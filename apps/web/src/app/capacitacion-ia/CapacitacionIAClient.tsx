@@ -1,3 +1,14 @@
+/**
+ * Componente: CapacitacionIAClient - Pilar 1
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * 
+ * Implementa: Pilar 1 - Capacitación por rol con tabs interactivos
+ */
+
 'use client';
 
 import React, { useState } from 'react';
@@ -91,6 +102,10 @@ export function CapacitacionIAClient() {
 
   return (
     <>
+      {/* AI Context: Estrategia de Adopción IA - ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md */}
+      {/* AI Context: PRD Pulse Hub - ../../../docs/product/PRD-PULSE-HUB.md */}
+      {/* AI Context: Esta página implementa Pilar 1 - Capacitación IA por rol */}
+      
       <Navbar />
       
       <main>

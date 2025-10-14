@@ -1,3 +1,15 @@
+/**
+ * Página: Homepage - Pulse Hub
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * - Arquitectura: ../../docs/reference/ARCHITECTURE.md
+ * 
+ * Esta página implementa: Homepage con Hero, Tres Pilares, Resultados Medibles, Cómo Funciona, Testimonios y CTA Final
+ */
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -79,6 +91,11 @@ export default function Home() {
 
   return (
     <>
+      {/* AI Context: Estrategia de Adopción IA - ../../docs/product/ESTRATEGIA-ADOPCION-IA.md */}
+      {/* AI Context: PRD Pulse Hub - ../../docs/product/PRD-PULSE-HUB.md */}
+      {/* AI Context: Design System - ../../docs/design/DESIGN-SYSTEM-PROMPT.md */}
+      {/* AI Context: Esta página implementa la Homepage principal con Hero, Tres Pilares, Resultados y Testimonios */}
+      
       <Navbar />
       <main className="overflow-hidden">
         {/* Hero Section */}

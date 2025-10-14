@@ -1,3 +1,14 @@
+/**
+ * Componente: RecursosClient - AI Academy
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * 
+ * Implementa: AI Academy con cursos, guías descargables y biblioteca de prompts
+ */
+
 'use client';
 
 import React from 'react';
@@ -86,6 +97,10 @@ const guias: Guia[] = [
 export function RecursosClient() {
   return (
     <>
+      {/* AI Context: Estrategia de Adopción IA - ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md */}
+      {/* AI Context: PRD Pulse Hub - ../../../docs/product/PRD-PULSE-HUB.md */}
+      {/* AI Context: Esta página implementa AI Academy con cursos, guías y biblioteca de prompts */}
+      
       <Navbar />
       
       <main>

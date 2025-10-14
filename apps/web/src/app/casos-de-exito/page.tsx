@@ -1,3 +1,15 @@
+/**
+ * Página: Casos de Éxito
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * - Arquitectura: ../../../docs/reference/ARCHITECTURE.md
+ * 
+ * Esta página implementa: Casos de éxito con filtros por industria y resultados medibles
+ */
+
 import type { Metadata } from 'next';
 import { CasosDeExitoClient } from './CasosDeExitoClient';
 

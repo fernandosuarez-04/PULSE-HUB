@@ -1,3 +1,14 @@
+/**
+ * Componente: AdopcionDiariaClient - Pilar 2
+ * 
+ * Documentación de Contexto para Asistentes IA:
+ * - Estrategia de Adopción IA: ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md
+ * - PRD Completo: ../../../docs/product/PRD-PULSE-HUB.md
+ * - Design System: ../../../docs/design/DESIGN-SYSTEM-PROMPT.md
+ * 
+ * Implementa: Pilar 2 - Adopción Diaria con AI Buddy, rituales y biblioteca de prompts
+ */
+
 'use client';
 
 import React, { useState } from 'react';
@@ -133,8 +144,12 @@ export function AdopcionDiariaClient() {
 
   return (
     <>
-      <Navbar />
+      {/* AI Context: Estrategia de Adopción IA - ../../../docs/product/ESTRATEGIA-ADOPCION-IA.md */}
+      {/* AI Context: PRD Pulse Hub - ../../../docs/product/PRD-PULSE-HUB.md */}
+      {/* AI Context: Esta página implementa Pilar 2 - Adopción Diaria con AI Buddy y rituales */}
       
+      <Navbar />
+
       <main>
         {/* Hero Section */}
         <section className="relative min-h-[60vh] flex items-center justify-center 

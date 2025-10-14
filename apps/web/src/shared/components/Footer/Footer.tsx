@@ -85,7 +85,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="https://linkedin.com/company/pulsehub"
+                  href="https://www.linkedin.com/company/ecos-de-liderazgo"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
@@ -104,13 +104,13 @@ export const Footer: React.FC = () => {
             © 2025 Pulse Hub. Todos los derechos reservados.
           </p>
           <div className="flex gap-6">
-            <Link href="/privacidad" className="text-sm text-white/60 hover:text-white transition-colors">
+            <Link href="/sobre" className="text-sm text-white/60 hover:text-white transition-colors">
               Privacidad
             </Link>
-            <Link href="/terminos" className="text-sm text-white/60 hover:text-white transition-colors">
+            <Link href="/sobre" className="text-sm text-white/60 hover:text-white transition-colors">
               Términos
             </Link>
-            <Link href="/cookies" className="text-sm text-white/60 hover:text-white transition-colors">
+            <Link href="/sobre" className="text-sm text-white/60 hover:text-white transition-colors">
               Cookies
             </Link>
           </div>
