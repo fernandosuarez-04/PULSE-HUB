@@ -9,8 +9,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Loader2, WifiOff } from 'lucide-react';
+import { X, Send, Loader2, WifiOff, Mic, MicOff } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
+import { useVoiceRecognition } from './useVoiceRecognition';
 import type { UseAIChatReturn } from './useAIChat';
 
 interface ChatWindowProps {
@@ -23,6 +24,9 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Voice recognition hook
+  const voice = useVoiceRecognition();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -38,6 +42,20 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     }
   }, [isOpen]);
 
+  // Handle voice transcript
+  useEffect(() => {
+    if (voice.transcript && !voice.isListening) {
+      // When voice recognition completes, set transcript to input
+      setInputValue(voice.transcript);
+      voice.clearTranscript();
+      // Auto-submit the voice message
+      if (voice.transcript.trim() && !chat.isTyping) {
+        chat.sendMessage(voice.transcript);
+        setInputValue('');
+      }
+    }
+  }, [voice.transcript, voice.isListening, chat, voice]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim() && !chat.isTyping) {
@@ -50,6 +68,14 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
+    }
+  };
+
+  const handleVoiceToggle = () => {
+    if (voice.isListening) {
+      voice.stopListening();
+    } else {
+      voice.startListening();
     }
   };
 
@@ -170,6 +196,24 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
             onSubmit={handleSubmit}
             className="border-t border-[var(--neutral-200)] px-4 py-4 bg-white"
           >
+            {/* Voice recognition error */}
+            {voice.error && (
+              <div className="mb-3 px-3 py-2 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
+                rounded-[var(--radius-md)] text-xs flex items-center gap-2">
+                <WifiOff size={14} />
+                <span>{voice.error}</span>
+              </div>
+            )}
+
+            {/* Listening indicator */}
+            {voice.isListening && (
+              <div className="mb-3 px-3 py-2 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
+                rounded-[var(--radius-md)] text-xs flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[var(--accent-red)] animate-pulse" />
+                <span className="font-medium">Escuchando...</span>
+              </div>
+            )}
+
             <div className="flex gap-2">
               <input
                 ref={inputRef}
@@ -178,7 +222,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Escribe tu pregunta..."
-                disabled={!chat.isConnected || chat.isTyping}
+                disabled={!chat.isConnected || chat.isTyping || voice.isListening}
                 className="flex-1 px-4 py-2.5 border border-[var(--neutral-200)]
                   rounded-[var(--radius-md)] text-sm
                   focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]
@@ -186,9 +230,33 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                   disabled:opacity-50 disabled:cursor-not-allowed
                   placeholder:text-[var(--neutral-400)]"
               />
+
+              {/* Voice recognition button (only show if supported) */}
+              {voice.isSupported && (
+                <button
+                  type="button"
+                  onClick={handleVoiceToggle}
+                  disabled={!chat.isConnected || chat.isTyping}
+                  className={`px-4 py-2.5 rounded-[var(--radius-md)]
+                    transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+                    flex items-center justify-center min-w-[44px]
+                    ${voice.isListening
+                      ? 'bg-[var(--accent-red)] text-white hover:bg-[var(--accent-red)]/90'
+                      : 'bg-[var(--neutral-200)] text-[var(--neutral-700)] hover:bg-[var(--neutral-300)]'
+                    }`}
+                  aria-label={voice.isListening ? 'Detener grabación' : 'Iniciar grabación de voz'}
+                >
+                  {voice.isListening ? (
+                    <MicOff size={18} />
+                  ) : (
+                    <Mic size={18} />
+                  )}
+                </button>
+              )}
+
               <button
                 type="submit"
-                disabled={!chat.isConnected || chat.isTyping || !inputValue.trim()}
+                disabled={!chat.isConnected || chat.isTyping || !inputValue.trim() || voice.isListening}
                 className="px-4 py-2.5 bg-[var(--primary-600)] text-white
                   rounded-[var(--radius-md)] hover:bg-[var(--primary-600)]/90
                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed
@@ -204,6 +272,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
             </div>
             <p className="text-xs text-[var(--neutral-500)] mt-2 text-center">
               Presiona Enter para enviar • Shift+Enter para nueva línea
+              {voice.isSupported && ' • Click en micrófono para voz'}
             </p>
           </form>
         </motion.div>
