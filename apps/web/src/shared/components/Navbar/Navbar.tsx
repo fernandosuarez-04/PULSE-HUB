@@ -3,13 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/shared/components';
+import { cn } from '@/shared/utils/cn';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,15 +60,23 @@ const Navbar: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="px-3 py-2 text-[var(--text-sm)] font-medium text-[var(--neutral-600)] hover:text-[var(--primary-600)] transition-colors rounded-lg hover:bg-[var(--primary-100)]"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "px-3 py-2 text-[var(--text-sm)] font-medium transition-colors rounded-lg",
+                    isActive
+                      ? "text-[var(--primary-600)] bg-[var(--primary-100)]"
+                      : "text-[var(--neutral-600)] hover:text-[var(--primary-600)] hover:bg-[var(--primary-100)]"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
 
           {/* CTA Button */}
@@ -97,16 +108,24 @@ const Navbar: React.FC = () => {
             transition={{ duration: 0.2 }}
           >
             <div className="container mx-auto px-4 py-4 space-y-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="block px-4 py-3 text-[var(--text-base)] font-medium text-[var(--neutral-900)] hover:bg-[var(--primary-100)] hover:text-[var(--primary-600)] rounded-lg transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "block px-4 py-3 text-[var(--text-base)] font-medium rounded-lg transition-colors",
+                      isActive
+                        ? "text-[var(--primary-600)] bg-[var(--primary-100)]"
+                        : "text-[var(--neutral-900)] hover:bg-[var(--primary-100)] hover:text-[var(--primary-600)]"
+                    )}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
               <div className="pt-2">
                 <Button variant="primary" size="md" className="w-full">
                   Agendar Demo
