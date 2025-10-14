@@ -17,7 +17,7 @@ export class AIChatService {
     // Initialize OpenAI Service
     this.openaiService = createOpenAIService();
     this.sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.log(`🤖 AI Chat Service initialized | Session: ${this.sessionId}`);
+    // console.log(`🤖 AI Chat Service initialized | Session: ${this.sessionId}`);
   }
 
   /**
@@ -35,7 +35,7 @@ export class AIChatService {
         this.greeted = true;
         const response = this.getGreetingResponse();
         const latency = Date.now() - startTime;
-        console.log(`✅ Greeting response sent (${latency}ms)`);
+        // console.log(`✅ Greeting response sent (${latency}ms)`);
         return response;
       }
 
@@ -47,22 +47,22 @@ export class AIChatService {
       );
       const toolDuration = Date.now() - toolStartTime;
 
-      console.log(
-        `✅ OpenAI response generated (${toolDuration}ms) | Length: ${response.length} chars`
-      );
+      // console.log(
+      //   `✅ OpenAI response generated (${toolDuration}ms) | Length: ${response.length} chars`
+      // );
 
       const latency = Date.now() - startTime;
-      console.log(`⏱️ Total latency: ${latency}ms`);
+      // console.log(`⏱️ Total latency: ${latency}ms`);
 
       return response;
     } catch (error) {
-      console.error('❌ Error in AIChatService:', error);
+      // console.error('❌ Error in AIChatService:', error);
 
       // Fallback response on error
       const errorResponse =
         'Disculpa, tuve un problema al procesar tu pregunta. ¿Podrías reformularla o preguntar algo diferente?';
       const latency = Date.now() - startTime;
-      console.log(`⚠️ Error response sent (${latency}ms)`);
+      // console.log(`⚠️ Error response sent (${latency}ms)`);
       return errorResponse;
     }
   }
@@ -109,7 +109,7 @@ export class AIChatService {
   clearHistory(): void {
     this.openaiService.clearHistory(this.sessionId);
     this.greeted = false;
-    console.log(`🔄 History cleared for session ${this.sessionId}`);
+    // console.log(`🔄 History cleared for session ${this.sessionId}`);
   }
 
   /**

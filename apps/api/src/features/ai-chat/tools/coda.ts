@@ -29,7 +29,7 @@ export async function getTableColumns(): Promise<ColumnInfo[]> {
   const tableId = process.env.CODA_TABLE_ID;
 
   if (!apiKey || !docId || !tableId) {
-    console.warn('❌ Coda environment variables not fully configured');
+    // console.warn('❌ Coda environment variables not fully configured');
     return [];
   }
 
@@ -45,14 +45,14 @@ export async function getTableColumns(): Promise<ColumnInfo[]> {
 
     if (!res.ok) {
       const text = await res.text();
-      console.error('❌ Error fetching Coda columns:', res.status, text);
+      // console.error('❌ Error fetching Coda columns:', res.status, text);
       return [];
     }
 
     const json = (await res.json()) as ColumnsResponse;
     return json.items;
   } catch (err) {
-    console.error('❌ Error in getTableColumns:', err);
+    // console.error('❌ Error in getTableColumns:', err);
     return [];
   }
 }
@@ -68,13 +68,13 @@ export async function getTableRows(limit: number = 10): Promise<CodaRow[]> {
   const tableId = process.env.CODA_TABLE_ID;
 
   if (!apiKey || !docId || !tableId) {
-    console.warn('❌ Coda environment variables not fully configured');
-    console.warn('💡 Configure CODA_API_KEY, CODA_DOC_ID, and CODA_TABLE_ID');
+    // console.warn('❌ Coda environment variables not fully configured');
+    // console.warn('💡 Configure CODA_API_KEY, CODA_DOC_ID, and CODA_TABLE_ID');
     return [];
   }
 
   const url = `${BASE}/docs/${docId}/tables/${tableId}/rows?limit=${limit}&useColumnNames=true`;
-  console.log('🔗 Querying Coda:', url.replace(apiKey, '***'));
+  // console.log('🔗 Querying Coda:', url.replace(apiKey, '***'));
 
   try {
     const res = await fetch(url, {
@@ -86,15 +86,15 @@ export async function getTableRows(limit: number = 10): Promise<CodaRow[]> {
 
     if (!res.ok) {
       const text = await res.text();
-      console.error('❌ Coda API error:', res.status, text);
+      // console.error('❌ Coda API error:', res.status, text);
       throw new Error(`Coda API error ${res.status}: ${text}`);
     }
 
     const json = (await res.json()) as TableRowsResponse;
-    console.log(`✅ Retrieved ${json.items.length} rows from Coda`);
+    // console.log(`✅ Retrieved ${json.items.length} rows from Coda`);
     return json.items;
   } catch (err) {
-    console.error('❌ Error fetching rows from Coda:', err);
+    // console.error('❌ Error fetching rows from Coda:', err);
     return [];
   }
 }
@@ -119,7 +119,7 @@ export async function searchInCoda(query: string): Promise<string> {
     .split(/\s+/)
     .filter((word) => word.length > 3);
 
-  console.log(`🔍 Searching in Coda with keywords:`, keywords);
+  // console.log(`🔍 Searching in Coda with keywords:`, keywords);
 
   // Search for the best match in all rows
   let bestMatch = '';
@@ -148,7 +148,7 @@ export async function searchInCoda(query: string): Promise<string> {
   }
 
   if (bestMatch && bestScore > 0) {
-    console.log(`✅ Found relevant content (score: ${bestScore})`);
+    // console.log(`✅ Found relevant content (score: ${bestScore})`);
 
     // Truncate if too long (max 2000 characters for context)
     if (bestMatch.length > 2000) {
@@ -170,7 +170,7 @@ export async function searchInCoda(query: string): Promise<string> {
     return bestMatch;
   }
 
-  console.log('⚠️ No relevant content found for the query');
+  // console.log('⚠️ No relevant content found for the query');
   return '';
 }
 

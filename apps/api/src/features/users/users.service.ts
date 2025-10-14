@@ -64,7 +64,7 @@ export class UsersService {
   async deleteUser(id: string): Promise<void> {
     // TODO: Implementar lógica para eliminar usuario de la base de datos
     const user = await this.getUserById(id);
-    console.log(`Usuario ${user.name} eliminado`);
+    // console.log(`Usuario ${user.name} eliminado`);
   }
 }
 

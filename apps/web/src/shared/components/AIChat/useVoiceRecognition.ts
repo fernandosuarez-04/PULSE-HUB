@@ -53,7 +53,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
 
         // Event handlers
         recognition.onstart = () => {
-          console.log('🎤 Voice recognition started');
+          // console.log('🎤 Voice recognition started');
           setIsListening(true);
           setError(null);
         };
@@ -63,15 +63,15 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
           const transcriptText = result[0].transcript;
           const confidence = result[0].confidence;
 
-          console.log(
-            `📝 Transcription: "${transcriptText}" (confidence: ${(confidence * 100).toFixed(1)}%)`
-          );
+          // console.log(
+          //   `📝 Transcription: "${transcriptText}" (confidence: ${(confidence * 100).toFixed(1)}%)`
+          // );
 
           setTranscript(transcriptText);
         };
 
         recognition.onerror = (event: any) => {
-          console.error('❌ Voice recognition error:', event.error);
+          // console.error('❌ Voice recognition error:', event.error);
 
           switch (event.error) {
             case 'not-allowed':
@@ -103,7 +103,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
         };
 
         recognition.onend = () => {
-          console.log('🔄 Voice recognition ended');
+          // console.log('🔄 Voice recognition ended');
           setIsListening(false);
         };
 
@@ -141,7 +141,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
       setError(null);
       recognitionRef.current.start();
     } catch (err) {
-      console.error('❌ Error starting recognition:', err);
+      // console.error('❌ Error starting recognition:', err);
       setError('Error al iniciar el reconocimiento de voz.');
     }
   }, [isListening]);
@@ -157,7 +157,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
     try {
       recognitionRef.current.stop();
     } catch (err) {
-      console.error('❌ Error stopping recognition:', err);
+      // console.error('❌ Error stopping recognition:', err);
     }
   }, [isListening]);
 

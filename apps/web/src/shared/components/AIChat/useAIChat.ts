@@ -55,11 +55,11 @@ export function useAIChat(): UseAIChatReturn {
     }
 
     try {
-      console.log('🔌 Connecting to WebSocket:', WS_URL);
+      // console.log('🔌 Connecting to WebSocket:', WS_URL);
       const ws = new WebSocket(WS_URL);
 
       ws.onopen = () => {
-        console.log('✅ WebSocket connected');
+        // console.log('✅ WebSocket connected');
         setIsConnected(true);
         setError(null);
         reconnectAttemptsRef.current = 0;
@@ -70,7 +70,7 @@ export function useAIChat(): UseAIChatReturn {
           const data = JSON.parse(event.data);
 
           if (data.type === 'connection_established') {
-            console.log('🤝 Connection established:', data.sessionId);
+            // console.log('🤝 Connection established:', data.sessionId);
             // Optional: Add welcome message to chat
             if (data.text) {
               setMessages((prev) => [
@@ -99,22 +99,22 @@ export function useAIChat(): UseAIChatReturn {
           } else if (data.type === 'error') {
             setIsTyping(false);
             setError(data.error || 'Ocurrió un error');
-            console.error('❌ Error from server:', data.error);
+            // console.error('❌ Error from server:', data.error);
           }
         } catch (err) {
-          console.error('❌ Error parsing message:', err);
+          // console.error('❌ Error parsing message:', err);
         }
       };
 
       ws.onclose = () => {
-        console.log('🔌 WebSocket disconnected');
+        // console.log('🔌 WebSocket disconnected');
         setIsConnected(false);
         setIsTyping(false);
 
         // Attempt to reconnect with exponential backoff
         if (reconnectAttemptsRef.current < 5) {
           const delay = Math.min(1000 * 2 ** reconnectAttemptsRef.current, 10000);
-          console.log(`🔄 Reconnecting in ${delay}ms...`);
+          // console.log(`🔄 Reconnecting in ${delay}ms...`);
           reconnectAttemptsRef.current++;
 
           reconnectTimeoutRef.current = setTimeout(() => {
@@ -128,13 +128,13 @@ export function useAIChat(): UseAIChatReturn {
       };
 
       ws.onerror = (err) => {
-        console.error('❌ WebSocket error:', err);
+        // console.error('❌ WebSocket error:', err);
         setError('Error de conexión con el servidor');
       };
 
       wsRef.current = ws;
     } catch (err) {
-      console.error('❌ Error creating WebSocket:', err);
+      // console.error('❌ Error creating WebSocket:', err);
       setError('No se pudo conectar con el servidor');
     }
   }, []);
@@ -170,7 +170,7 @@ export function useAIChat(): UseAIChatReturn {
       })
     );
 
-    console.log('📤 Sent message:', trimmedText);
+    // console.log('📤 Sent message:', trimmedText);
   }, []);
 
   /**

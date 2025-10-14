@@ -87,7 +87,7 @@ export class OpenAIService {
     });
     this.conversationHistory = new Map();
 
-    console.log('✅ OpenAI Service initialized with model:', config.model);
+    // console.log('✅ OpenAI Service initialized with model:', config.model);
   }
 
   /**
@@ -175,7 +175,7 @@ export class OpenAIService {
 
       return assistantResponse;
     } catch (error) {
-      console.error('❌ Error in OpenAI Service:', error);
+      // console.error('❌ Error in OpenAI Service:', error);
       throw new Error(
         `Error processing message: ${error instanceof Error ? error.message : String(error)}`
       );
@@ -202,10 +202,10 @@ export class OpenAIService {
       const functionName = toolCall.function.name;
       const functionArgs = JSON.parse(toolCall.function.arguments);
 
-      console.log(
-        `🔧 OpenAI requested tool: ${functionName} with args:`,
-        functionArgs
-      );
+      // console.log(
+      //   `🔧 OpenAI requested tool: ${functionName} with args:`,
+      //   functionArgs
+      // );
 
       let functionResponse: string;
 
@@ -215,9 +215,9 @@ export class OpenAIService {
         functionResponse =
           searchResult ||
           'No se encontró información relevante en la base de conocimiento.';
-        console.log(
-          `📊 Search result from Coda: ${searchResult ? 'Found' : 'Not found'} (${searchResult?.length || 0} chars)`
-        );
+        // console.log(
+        //   `📊 Search result from Coda: ${searchResult ? 'Found' : 'Not found'} (${searchResult?.length || 0} chars)`
+        // );
       } else {
         functionResponse = `Function ${functionName} not implemented.`;
       }
@@ -283,7 +283,7 @@ export class OpenAIService {
    */
   clearHistory(sessionId: string): void {
     this.conversationHistory.delete(sessionId);
-    console.log(`🗑️ History cleared for session: ${sessionId}`);
+    // console.log(`🗑️ History cleared for session: ${sessionId}`);
   }
 
   /**
@@ -291,7 +291,7 @@ export class OpenAIService {
    */
   clearAllHistory(): void {
     this.conversationHistory.clear();
-    console.log('🗑️ All conversation history cleared');
+    // console.log('🗑️ All conversation history cleared');
   }
 }
 

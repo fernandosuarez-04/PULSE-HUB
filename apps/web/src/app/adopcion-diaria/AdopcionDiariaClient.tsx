@@ -138,7 +138,7 @@ export function AdopcionDiariaClient() {
       setCopiedPrompt(title);
       setTimeout(() => setCopiedPrompt(null), 2000);
     } catch (err) {
-      console.error('Error copying to clipboard:', err);
+      // console.error('Error copying to clipboard:', err);
     }
   };
 

@@ -62,10 +62,10 @@ const wss = new WebSocketServer({ server, path: '/ws/chat' });
 // Map to store AI Chat Service instances per connection
 const chatInstances = new Map<WebSocket, AIChatService>();
 
-console.log('🔌 Initializing WebSocket Server for AI Chat...');
+// console.log('🔌 Initializing WebSocket Server for AI Chat...');
 
 wss.on('connection', (ws: WebSocket) => {
-  console.log('👤 New WebSocket client connected');
+  // console.log('👤 New WebSocket client connected');
 
   // Create a new AI Chat Service instance for this connection
   const chatService = new AIChatService();
@@ -85,7 +85,7 @@ wss.on('connection', (ws: WebSocket) => {
       const clientMessage: ClientMessage = JSON.parse(data.toString());
 
       if (clientMessage.type === 'user_message') {
-        console.log(`📩 Received message: "${clientMessage.text}"`);
+        // console.log(`📩 Received message: "${clientMessage.text}"`);
 
         // Send typing indicator
         const typingMessage: ServerMessage = {
@@ -108,10 +108,10 @@ wss.on('connection', (ws: WebSocket) => {
         };
         ws.send(JSON.stringify(agentMessage));
 
-        console.log(`📤 Sent response: "${response.substring(0, 50)}..."`);
+        // console.log(`📤 Sent response: "${response.substring(0, 50)}..."`);
       }
     } catch (error) {
-      console.error('❌ Error processing message:', error);
+      // console.error('❌ Error processing message:', error);
 
       // Send error message to client
       const errorMessage: ServerMessage = {
@@ -125,7 +125,7 @@ wss.on('connection', (ws: WebSocket) => {
 
   // Handle disconnection
   ws.on('close', () => {
-    console.log('👋 WebSocket client disconnected');
+    // console.log('👋 WebSocket client disconnected');
     const chatService = chatInstances.get(ws);
     if (chatService) {
       chatService.clearHistory();
@@ -135,16 +135,16 @@ wss.on('connection', (ws: WebSocket) => {
 
   // Handle errors
   ws.on('error', (error) => {
-    console.error('❌ WebSocket error:', error);
+    // console.error('❌ WebSocket error:', error);
   });
 });
 
 // Iniciar servidor
 server.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`🔌 WebSocket disponible en ws://localhost:${PORT}/ws/chat`);
-  console.log(`📚 API Version: ${API_VERSION}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  // console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  // console.log(`🔌 WebSocket disponible en ws://localhost:${PORT}/ws/chat`);
+  // console.log(`📚 API Version: ${API_VERSION}`);
+  // console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 export default app;
