@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
       { href: '/capacitacion-ia', label: 'Capacitación IA' },
       { href: '/adopcion-diaria', label: 'Adopción Diaria' },
       { href: '/automatizacion', label: 'Automatización' },
-    { href: '/casos', label: 'Casos de Éxito' },
+    { href: '/casos-de-exito', label: 'Casos de Éxito' },
     { href: '/recursos', label: 'Recursos' },
   ];
 
