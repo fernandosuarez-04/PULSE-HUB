@@ -2,6 +2,20 @@
 
 Aplicación frontend desarrollada con Next.js 15, TypeScript y TailwindCSS.
 
+## 🆕 Última Actualización (14 Enero 2025)
+
+### ✅ Página de Contacto/Agenda Demo Implementada
+- **Hero Section**: "Comencemos Juntos" con animaciones
+- **Layout 2 Columnas**: Cards de acción + Formulario completo
+- **Formulario Avanzado**: 7 campos con validación en tiempo real
+- **Footer Unificado**: Componente reutilizable en todas las páginas
+- **Navegación Actualizada**: Botón "Agendar Demo" enlaza a `/contacto`
+
+### 🧩 Nuevos Componentes
+- **Footer**: Componente reutilizable con enlaces funcionales
+- **AnimatedSection**: Para animaciones de scroll con variantes
+- **ParticlesBackground**: Fondo de partículas animadas
+
 ## 🏗️ Estructura Screaming Architecture
 
 ```
@@ -19,7 +33,13 @@ src/
 │
 ├── shared/              # Código compartido
 │   ├── components/      # Componentes reutilizables
-│   │   └── Button/
+│   │   ├── Button/      # Botón con variantes
+│   │   ├── Card/        # Card base con hover
+│   │   ├── Navbar/      # Navegación sticky
+│   │   ├── Footer/      # Footer reutilizable
+│   │   ├── WavesSVG/    # Ondas animadas
+│   │   ├── ParticlesBackground/ # Fondo de partículas
+│   │   └── AnimatedSection/ # Animaciones de scroll
 │   ├── hooks/          # Custom hooks
 │   │   └── useDebounce
 │   └── utils/          # Utilidades
@@ -60,14 +80,42 @@ npm run lint
 
 Los componentes base están en `src/shared/components/` y pueden ser reutilizados en todo el proyecto.
 
-Ejemplo de uso:
+### Componentes Disponibles
 
+#### Button
 ```tsx
 import { Button } from '@/shared/components';
 
-export default function MyComponent() {
-  return <Button variant="primary">Click me</Button>;
-}
+<Button variant="primary" size="md">Click me</Button>
+// Variantes: primary, secondary, tertiary
+// Tamaños: sm, md, lg
+```
+
+#### Card
+```tsx
+import { Card } from '@/shared/components';
+
+<Card hover={true} className="p-6">
+  <h3>Mi Card</h3>
+</Card>
+```
+
+#### Footer
+```tsx
+import { Footer } from '@/shared/components';
+
+<Footer />
+// Componente reutilizable con enlaces funcionales
+```
+
+#### AnimatedSection
+```tsx
+import { AnimatedSection } from '@/shared/components';
+
+<AnimatedSection variant="slideUp" delay={0.2}>
+  <h2>Contenido animado</h2>
+</AnimatedSection>
+// Variantes: fade, slide, scale, slideUp
 ```
 
 ## 🔐 Autenticación
