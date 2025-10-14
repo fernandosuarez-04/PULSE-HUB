@@ -8,7 +8,8 @@
 'use client';
 
 import React from 'react';
-import { User, Bot } from 'lucide-react';
+import Image from 'next/image';
+import { User } from 'lucide-react';
 import type { ChatMessage as ChatMessageType } from './useAIChat';
 
 interface ChatMessageProps {
@@ -33,7 +34,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
         {isUser ? (
           <User size={18} className="text-white" />
         ) : (
-          <Bot size={18} className="text-white" />
+          <Image
+            src="/AgenteWeb.png"
+            alt="Agente IA"
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-full object-cover"
+          />
         )}
       </div>
 
