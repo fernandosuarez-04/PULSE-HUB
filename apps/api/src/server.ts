@@ -1,8 +1,14 @@
+// Cargar variables de entorno PRIMERO (antes de cualquier import)
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Configurar dotenv con el path explícito
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { errorHandler } from './core/middleware/errorHandler';
@@ -12,11 +18,15 @@ import { contactRoutes } from './features/contact/contact.routes';
 import { AIChatService } from './features/ai-chat';
 import type { ClientMessage, ServerMessage } from './features/ai-chat';
 
-// Cargar variables de entorno
-dotenv.config();
-
 const app: Application = express();
 const PORT = process.env.PORT || 4000;
+
+// Debug: Verificar que las variables de entorno se cargaron
+console.log('🔧 Configuración del servidor:');
+console.log('  - PORT:', PORT);
+console.log('  - NODE_ENV:', process.env.NODE_ENV);
+console.log('  - OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? '✅ Configurado' : '❌ No configurado');
+console.log('  - ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS);
 
 // Middleware global
 app.use(helmet());
