@@ -181,6 +181,26 @@ export default function Home() {
                   </motion.div>
                 ))}
               </div>
+
+              {/* Video de YouTube */}
+              <motion.div
+                className="mt-12 max-w-5xl mx-auto"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+              >
+                <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="aspect-video">
+                    <iframe
+                      className="w-full h-full"
+                      src="https://www.youtube.com/embed/LZ5rDmMSKCc"
+                      title="Pulse Hub - Introducción"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
           </div>
         </section>
