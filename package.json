@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "predev": "npm run build --workspace=packages/shared",
-    "dev": "npx concurrently -n \"FRONTEND,BACKEND\" -c \"cyan,magenta\" \"npm run dev:web\" \"npm run dev:api\"",
+    "dev": "concurrently --kill-others-on-fail -n \"FRONTEND,BACKEND\" -c \"cyan,magenta\" \"npm run dev:web\" \"npm run dev:api\"",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run dev --workspace=apps/api",
     "build": "npm run build --workspace=packages/shared && npm run build --workspaces",

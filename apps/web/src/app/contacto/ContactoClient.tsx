@@ -180,16 +180,28 @@ export const ContactoClient: React.FC = () => {
   // Manejo del submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setLoading(true);
     setError(false);
 
     try {
-      // Simulación de envío
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+      const response = await fetch(`${apiUrl}/v1/contact/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Error al enviar el mensaje');
+      }
+
       setSuccess(true);
       setFormData({
         fullName: '',
@@ -202,6 +214,7 @@ export const ContactoClient: React.FC = () => {
       });
       setTouched({});
     } catch (err) {
+      console.error('Error al enviar formulario:', err);
       setError(true);
     } finally {
       setLoading(false);

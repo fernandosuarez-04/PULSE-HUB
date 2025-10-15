@@ -8,6 +8,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { errorHandler } from './core/middleware/errorHandler';
 import { authRoutes } from './features/auth/auth.routes';
 import { userRoutes } from './features/users/users.routes';
+import { contactRoutes } from './features/contact/contact.routes';
 import { AIChatService } from './features/ai-chat';
 import type { ClientMessage, ServerMessage } from './features/ai-chat';
 
@@ -38,6 +39,7 @@ app.get('/health', (_req, res) => {
 const API_VERSION = process.env.API_VERSION || 'v1';
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
 app.use(`/api/${API_VERSION}/users`, userRoutes);
+app.use(`/api/${API_VERSION}/contact`, contactRoutes);
 
 // Error handling middleware (debe ir al final)
 app.use(errorHandler);
