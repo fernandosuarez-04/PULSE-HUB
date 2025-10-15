@@ -15,6 +15,8 @@
   NEXT_PUBLIC_API_URL = "https://api.pulse-hub-1.netlify.app"
   NEXT_PUBLIC_APP_NAME = "PULSE HUB"
   NODE_VERSION = "20"
+  # No establecer NODE_ENV=production durante el build para que instale devDependencies
+  NPM_FLAGS = "--include=dev"
 
 # Variables de entorno para deploy previews
 [context.deploy-preview.environment]
