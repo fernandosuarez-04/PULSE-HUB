@@ -4,8 +4,8 @@
   # Base directory apunta a la raíz del monorepo
   base = "/"
 
-  # Build command: instalar dependencias, construir shared, luego web app
-  command = "npm install && npm run build --workspace=packages/shared && npm run build --workspace=apps/web"
+  # Build command: usar el script de build del monorepo que maneja shared + web
+  command = "npm run build:web"
 
   # Directorio de publicación
   publish = "apps/web/.next"

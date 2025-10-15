@@ -13,7 +13,7 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run dev --workspace=apps/api",
     "build": "npm run build --workspace=packages/shared && npm run build --workspaces",
-    "build:web": "npm run build --workspace=apps/web",
+    "build:web": "npm run build --workspace=packages/shared && npm run build --workspace=apps/web",
     "build:api": "npm run build --workspace=apps/api",
     "lint": "npm run lint --workspaces",
     "format": "npx prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
