@@ -9,7 +9,8 @@
       "Bash(npm run build)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(cmd.exe:*)"
+      "Bash(cmd.exe:*)",
+      "Bash(npm run build:web:*)"
     ],
     "deny": [],
     "ask": []

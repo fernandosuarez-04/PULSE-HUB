@@ -203,9 +203,9 @@ export function AdopcionDiariaClient() {
               {/* Tarjeta AI Buddy */}
               <AnimatedSection variant="slideUp" delay={0.15}>
                 <Card variant="glass" hover={true} className="h-full flex flex-col p-8">
-                  <div className="bg-[var(--accent-orange)]/10 text-[var(--accent-orange)] 
+                  <div className="bg-[var(--accent-orange)]/10 text-[var(--accent-orange)]
                     p-4 rounded-full mb-6 w-fit">
-                    <Sparkles size={32} strokeWidth={2} />
+                    <Sparkles size={32} />
                   </div>
                   <h3 className="text-2xl font-semibold text-[var(--neutral-900)] mb-4">
                     Tu AI Buddy
@@ -234,9 +234,9 @@ export function AdopcionDiariaClient() {
               {/* Tarjeta Rituales */}
               <AnimatedSection variant="slideUp" delay={0.2}>
                 <Card variant="glass" hover={true} className="h-full flex flex-col p-8">
-                  <div className="bg-[var(--primary-100)] text-[var(--primary-600)] 
+                  <div className="bg-[var(--primary-100)] text-[var(--primary-600)]
                     p-4 rounded-full mb-6 w-fit">
-                    <Calendar size={32} strokeWidth={2} />
+                    <Calendar size={32} />
                   </div>
                   <h3 className="text-2xl font-semibold text-[var(--neutral-900)] mb-4">
                     Rituales de Adopción
@@ -340,9 +340,9 @@ export function AdopcionDiariaClient() {
             <AnimatedSection variant="slideUp" delay={0.1}>
               <Card className="border-2 border-[var(--primary-600)]/20 bg-[var(--primary-100)]/30">
                 <div className="flex items-start gap-4">
-                  <div className="bg-[var(--primary-100)] text-[var(--primary-600)] 
+                  <div className="bg-[var(--primary-100)] text-[var(--primary-600)]
                     p-3 rounded-full flex-shrink-0">
-                    <Shield size={24} strokeWidth={2} />
+                    <Shield size={24} />
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-[var(--neutral-900)] mb-2">

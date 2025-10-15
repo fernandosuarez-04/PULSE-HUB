@@ -264,9 +264,9 @@ export function AutomatizacionClient() {
               {gobernanza.map((item, index) => (
                 <AnimatedSection key={index} variant="slideUp" delay={0.15 + index * 0.1}>
                   <Card hover={true} className="h-full flex flex-col p-8 text-center">
-                    <div className="bg-[var(--accent-green)]/10 text-[var(--accent-green)] 
+                    <div className="bg-[var(--accent-green)]/10 text-[var(--accent-green)]
                       p-4 rounded-full mb-6 w-fit mx-auto">
-                      <item.icon size={32} strokeWidth={2} />
+                      <item.icon size={32} />
                     </div>
                     <h3 className="text-xl font-semibold text-[var(--neutral-900)] mb-3">
                       {item.title}
