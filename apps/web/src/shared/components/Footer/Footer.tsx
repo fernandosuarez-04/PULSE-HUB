@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
                 alt="Pulse Hub Logo"
                 width={150}
                 height={35}
-                className="h-8 w-auto brightness-0 invert"
+                className="h-8 w-auto"
               />
             </div>
             <p className="text-sm text-white/70 leading-relaxed">

@@ -185,6 +185,25 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Video Section */}
+        <section className="py-12 md:py-16 bg-gradient-to-b from-[#f5f8ff] to-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <AnimatedSection>
+              <div className="max-w-4xl mx-auto">
+                <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: '56.25%' }}>
+                  <iframe
+                    className="absolute top-0 left-0 w-full h-full"
+                    src="https://www.youtube.com/embed/LZ5rDmMSKCc"
+                    title="Pulse Hub Video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+
         {/* Tres Pilares Section */}
         <section className="py-16 md:py-24 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
