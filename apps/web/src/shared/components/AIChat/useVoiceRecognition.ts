@@ -1,8 +1,18 @@
 /**
  * useVoiceRecognition Hook
  *
- * Custom hook for managing Web Speech API voice recognition.
- * Handles microphone permissions, continuous listening, and transcription.
+ * Custom hook for managing Web Speech API voice recognition with audio quality optimization.
+ * Based on proven implementation from agente-ia-conversacional.
+ *
+ * Features:
+ * - Spanish language recognition (es-ES)
+ * - Audio quality filters (echoCancellation, noiseSuppression, autoGainControl)
+ * - Optimized VAD (Voice Activity Detection) for fluid conversation
+ * - Comprehensive error handling with user-friendly messages
+ * - Single-shot recognition (stops after one result for natural conversation flow)
+ *
+ * Note: Web Speech API doesn't directly accept MediaStream input, but we request
+ * microphone permissions with quality constraints to influence the browser's audio pipeline.
  */
 
 'use client';
@@ -27,6 +37,18 @@ export interface UseVoiceRecognitionReturn {
   clearTranscript: () => void;
 }
 
+/**
+ * Audio constraints for high-quality voice recognition.
+ * These settings help reduce echo, background noise, and normalize volume levels.
+ */
+const AUDIO_CONSTRAINTS: MediaStreamConstraints = {
+  audio: {
+    echoCancellation: true, // Reduces echo from speakers
+    noiseSuppression: true, // Filters background noise
+    autoGainControl: true, // Normalizes microphone volume
+  },
+};
+
 export function useVoiceRecognition(): UseVoiceRecognitionReturn {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -34,6 +56,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
   const [isSupported, setIsSupported] = useState(false);
 
   const recognitionRef = useRef<any>(null);
+  const audioStreamRef = useRef<MediaStream | null>(null);
 
   // Check if Speech Recognition is supported
   useEffect(() => {
@@ -120,13 +143,69 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
           // Ignore errors on cleanup
         }
       }
+
+      // Stop audio stream if active
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach((track) => track.stop());
+        audioStreamRef.current = null;
+        console.log('🔇 Audio stream cleaned up');
+      }
     };
   }, []);
 
   /**
-   * Starts voice recognition
+   * Requests microphone permissions with audio quality filters.
+   * This helps improve audio quality for voice recognition by setting
+   * echo cancellation, noise suppression, and auto gain control.
+   *
+   * Note: While Web Speech API doesn't directly use this MediaStream,
+   * requesting permissions with quality constraints influences the browser's
+   * audio pipeline and may improve recognition accuracy.
    */
-  const startListening = useCallback(() => {
+  const requestMicrophonePermissions = useCallback(async () => {
+    try {
+      // Request microphone with quality filters
+      const stream = await navigator.mediaDevices.getUserMedia(
+        AUDIO_CONSTRAINTS
+      );
+
+      // Store stream for potential cleanup
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      audioStreamRef.current = stream;
+
+      console.log(
+        '🎤 Microphone permissions granted with quality filters:',
+        AUDIO_CONSTRAINTS.audio
+      );
+
+      return true;
+    } catch (err) {
+      console.error('❌ Error requesting microphone permissions:', err);
+
+      if (err instanceof Error) {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setError(
+            'Permisos de micrófono denegados. Por favor, permite el acceso al micrófono.'
+          );
+        } else if (err.name === 'NotFoundError') {
+          setError('No se encontró ningún micrófono. Verifica tu dispositivo.');
+        } else {
+          setError('Error al acceder al micrófono.');
+        }
+      }
+
+      return false;
+    }
+  }, []);
+
+  /**
+   * Starts voice recognition with audio quality optimization.
+   * First requests microphone permissions with quality filters,
+   * then starts the Web Speech API recognition.
+   */
+  const startListening = useCallback(async () => {
     if (!recognitionRef.current) {
       setError('Reconocimiento de voz no disponible en este navegador.');
       return;
@@ -139,15 +218,25 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
     try {
       setTranscript(''); // Clear previous transcript
       setError(null);
+
+      // Request microphone permissions with quality filters first
+      const hasPermissions = await requestMicrophonePermissions();
+
+      if (!hasPermissions) {
+        return; // Error already set by requestMicrophonePermissions
+      }
+
+      // Start speech recognition
       recognitionRef.current.start();
+      console.log('🎙️ Voice recognition started with optimized audio settings');
     } catch (err) {
-      // console.error('❌ Error starting recognition:', err);
+      console.error('❌ Error starting recognition:', err);
       setError('Error al iniciar el reconocimiento de voz.');
     }
-  }, [isListening]);
+  }, [isListening, requestMicrophonePermissions]);
 
   /**
-   * Stops voice recognition
+   * Stops voice recognition and cleans up audio stream.
    */
   const stopListening = useCallback(() => {
     if (!recognitionRef.current || !isListening) {
@@ -156,8 +245,15 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
 
     try {
       recognitionRef.current.stop();
+
+      // Clean up audio stream
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach((track) => track.stop());
+        audioStreamRef.current = null;
+        console.log('🔇 Audio stream stopped');
+      }
     } catch (err) {
-      // console.error('❌ Error stopping recognition:', err);
+      console.error('❌ Error stopping recognition:', err);
     }
   }, [isListening]);
 

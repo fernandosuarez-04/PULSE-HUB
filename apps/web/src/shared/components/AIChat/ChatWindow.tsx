@@ -10,9 +10,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Loader2, WifiOff, Mic, MicOff } from 'lucide-react';
+import { X, Send, Loader2, WifiOff, Mic, MicOff, Volume2 } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import { useVoiceRecognition } from './useVoiceRecognition';
+import { useVoiceSynthesis } from './useVoiceSynthesis';
 import type { UseAIChatReturn } from './useAIChat';
 
 interface ChatWindowProps {
@@ -25,9 +26,13 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const lastSpokenMessageIdRef = useRef<string | null>(null);
 
-  // Voice recognition hook
+  // Voice recognition hook (for user input)
   const voice = useVoiceRecognition();
+
+  // Voice synthesis hook (for agent responses)
+  const synthesis = useVoiceSynthesis();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -36,12 +41,21 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     }
   }, [chat.messages, chat.isTyping]);
 
-  // Focus input when window opens
+  // Focus input and warm up speech synthesis when window opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isOpen) {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+      // Focus input and optionally warm-up speech synthesis if the
+      // implementation exposes a warmUp() helper. Some implementations
+      // (current hook) don't provide it, so guard the call to avoid
+      // runtime errors like "synthesis.warmUp is not a function".
+      if (synthesis.isSupported && typeof (synthesis as any).warmUp === 'function') {
+        (synthesis as any).warmUp();
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, synthesis]);
 
   // Handle voice transcript
   useEffect(() => {
@@ -56,6 +70,38 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
       }
     }
   }, [voice.transcript, voice.isListening, chat, voice]);
+
+  // Auto-speak agent responses (only new messages)
+  useEffect(() => {
+    if (chat.messages.length === 0 || !synthesis.isSupported) return;
+
+    const lastMessage = chat.messages[chat.messages.length - 1];
+
+    // Only speak if:
+    // 1. It's an agent message
+    // 2. We haven't spoken this message before
+    // 3. The message has content
+    if (
+      lastMessage.role === 'assistant' &&
+      lastMessage.id !== lastSpokenMessageIdRef.current &&
+      lastMessage.content
+    ) {
+      console.log('🗣️ Speaking new message:', lastMessage.id);
+      // Mark this message as spoken
+      lastSpokenMessageIdRef.current = lastMessage.id;
+      // Speak the agent's response
+      synthesis.speak(lastMessage.content);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat.messages]); // Only depend on messages, not synthesis
+
+  // BARGE-IN: Stop agent speech when user starts speaking
+  useEffect(() => {
+    if (voice.isListening && synthesis.isSpeaking) {
+      console.log('⚡ Barge-in: User started speaking, stopping agent');
+      synthesis.stop();
+    }
+  }, [voice.isListening, synthesis]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,18 +159,33 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <div>
                 <h3 className="font-semibold text-base">Asistente IA</h3>
                 <p className="text-xs text-white/80">
-                  {chat.isConnected ? (
-                    <>
+                  {synthesis.isSpeaking ? (
+                    <span key="speaking" className="inline-flex items-center">
+                      <Volume2
+                        size={12}
+                        className="inline-block mr-1.5 animate-pulse"
+                        aria-hidden="true"
+                      />
+                      Hablando...
+                    </span>
+                  ) : chat.isConnected ? (
+                    <span key="online" className="inline-flex items-center">
                       <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent-green)] mr-1.5" />
                       En línea
-                    </>
+                    </span>
                   ) : (
-                    <>
+                    <span key="offline" className="inline-flex items-center">
                       <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent-red)] mr-1.5" />
                       Desconectado
-                    </>
+                    </span>
                   )}
                 </p>
+                {/* Voice info */}
+                {synthesis.isSupported && synthesis.selectedVoice && (
+                  <p className="text-[10px] text-white/60 mt-0.5">
+                    🎙️ {synthesis.selectedVoice.name}
+                  </p>
+                )}
               </div>
             </div>
             <button
@@ -240,6 +301,39 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                 rounded-[var(--radius-md)] text-xs flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[var(--accent-red)] animate-pulse" />
                 <span className="font-medium">Escuchando...</span>
+              </div>
+            )}
+
+            {/* Voice synthesis enable suggestion */}
+            {synthesis.error && (
+              <div className="mb-3 px-3 py-2 bg-[var(--primary-50)] text-[var(--primary-700)] rounded-[var(--radius-md)] text-xs flex items-center gap-2">
+                <Volume2 size={14} />
+                <span className="flex-1">{synthesis.error}</span>
+                {(synthesis as any).enable ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      try {
+                        (synthesis as any).enable();
+                        const lastMessage = chat.messages[chat.messages.length - 1];
+                        if (
+                          lastMessage &&
+                          lastMessage.role === 'assistant' &&
+                          lastMessage.id !== lastSpokenMessageIdRef.current &&
+                          lastMessage.content
+                        ) {
+                          lastSpokenMessageIdRef.current = lastMessage.id;
+                          synthesis.speak(lastMessage.content);
+                        }
+                      } catch (e) {
+                        // ignore
+                      }
+                    }}
+                    className="ml-2 underline text-[var(--primary-700)]"
+                  >
+                    Habilitar voz
+                  </button>
+                ) : null}
               </div>
             )}
 
