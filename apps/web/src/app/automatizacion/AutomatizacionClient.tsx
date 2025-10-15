@@ -187,7 +187,7 @@ export function AutomatizacionClient() {
         {/* Matriz Impacto-Esfuerzo */}
         <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--neutral-900)] text-center mb-4">
                 Matriz Impacto-Esfuerzo
               </h2>
@@ -196,7 +196,7 @@ export function AutomatizacionClient() {
               </p>
             </AnimatedSection>
 
-            <AnimatedSection animation="slideUp" delay={0.2}>
+            <AnimatedSection variant="slideUp" delay={0.2}>
               <div className="overflow-x-auto">
                 <table className="w-full bg-white rounded-xl overflow-hidden shadow-[var(--shadow-md)]">
                   {/* Table Header */}
@@ -254,7 +254,7 @@ export function AutomatizacionClient() {
         {/* Gobernanza Robusta */}
         <section className="py-12 md:py-16 bg-[var(--neutral-100)]">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--neutral-900)] text-center mb-12">
                 Gobernanza Robusta
               </h2>
@@ -262,11 +262,11 @@ export function AutomatizacionClient() {
 
             <div className="grid md:grid-cols-3 gap-8">
               {gobernanza.map((item, index) => (
-                <AnimatedSection key={index} animation="slideUp" delay={0.15 + index * 0.1}>
+                <AnimatedSection key={index} variant="slideUp" delay={0.15 + index * 0.1}>
                   <Card hover={true} className="h-full flex flex-col p-8 text-center">
-                    <div className="bg-[var(--accent-green)]/10 text-[var(--accent-green)] 
+                    <div className="bg-[var(--accent-green)]/10 text-[var(--accent-green)]
                       p-4 rounded-full mb-6 w-fit mx-auto">
-                      <item.icon size={32} strokeWidth={2} />
+                      <item.icon size={32} />
                     </div>
                     <h3 className="text-xl font-semibold text-[var(--neutral-900)] mb-3">
                       {item.title}
@@ -284,7 +284,7 @@ export function AutomatizacionClient() {
         {/* Resultados Medibles */}
         <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--neutral-900)] mb-4">
                 Resultados Medibles
               </h2>
@@ -295,7 +295,7 @@ export function AutomatizacionClient() {
 
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {kpis.map((kpi, index) => (
-                <AnimatedSection key={index} animation="slideUp" delay={0.15 + index * 0.1}>
+                <AnimatedSection key={index} variant="slideUp" delay={0.15 + index * 0.1}>
                   <Card 
                     variant="glass" 
                     className="p-8 flex flex-col items-center text-center h-full 
@@ -319,7 +319,7 @@ export function AutomatizacionClient() {
         {/* CTA Final */}
         <section className="py-12 md:py-16 bg-[var(--neutral-100)] text-center">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--neutral-900)] mb-6">
                 ¿Listo para Automatizar?
               </h2>

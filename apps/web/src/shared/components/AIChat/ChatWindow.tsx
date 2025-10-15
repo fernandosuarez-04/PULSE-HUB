@@ -16,6 +16,32 @@ import { useVoiceRecognition } from './useVoiceRecognition';
 import { useVoiceSynthesis } from './useVoiceSynthesis';
 import type { UseAIChatReturn } from './useAIChat';
 
+// Audio Equalizer Icon Component
+const AudioEqualizerIcon = ({ size = 18, className = '' }: { size?: number; className?: string }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 18 18"
+    className={className}
+    fill="currentColor"
+  >
+    {/* Left dot */}
+    <circle cx="2" cy="9" r="1.5" />
+
+    {/* Left bar */}
+    <rect x="5" y="6" width="2" height="6" rx="1" />
+
+    {/* Center bar (tallest) */}
+    <rect x="8" y="3" width="2.5" height="12" rx="1.25" />
+
+    {/* Right bar */}
+    <rect x="11.5" y="6" width="2" height="6" rx="1" />
+
+    {/* Right dot */}
+    <circle cx="16" cy="9" r="1.5" />
+  </svg>
+);
+
 interface ChatWindowProps {
   isOpen: boolean;
   onClose: () => void;
@@ -377,11 +403,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                     }`}
                   aria-label={voice.isListening ? 'Detener grabación' : 'Iniciar grabación de voz'}
                 >
-                  {voice.isListening ? (
-                    <MicOff size={18} />
-                  ) : (
-                    <Mic size={18} />
-                  )}
+                  <AudioEqualizerIcon size={18} />
                 </button>
               )}
 
@@ -420,6 +442,14 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               )}
             </p>
           </form>
+
+          {/* Voice Interface Overlay */}
+          <VoiceInterface
+            isActive={voice.isListening}
+            voice={voice}
+            messages={chat.messages}
+            onClose={() => voice.stopListening()}
+          />
         </motion.div>
       )}
     </AnimatePresence>

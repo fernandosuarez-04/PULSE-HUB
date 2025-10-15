@@ -190,7 +190,7 @@ export function AdopcionDiariaClient() {
         {/* Sección AI Buddy & Rituales */}
         <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--neutral-900)] text-center mb-4">
                 AI Buddy & Rituales
               </h2>
@@ -201,11 +201,11 @@ export function AdopcionDiariaClient() {
 
             <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Tarjeta AI Buddy */}
-              <AnimatedSection animation="slideUp" delay={0.15}>
+              <AnimatedSection variant="slideUp" delay={0.15}>
                 <Card variant="glass" hover={true} className="h-full flex flex-col p-8">
-                  <div className="bg-[var(--accent-orange)]/10 text-[var(--accent-orange)] 
+                  <div className="bg-[var(--accent-orange)]/10 text-[var(--accent-orange)]
                     p-4 rounded-full mb-6 w-fit">
-                    <Sparkles size={32} strokeWidth={2} />
+                    <Sparkles size={32} />
                   </div>
                   <h3 className="text-2xl font-semibold text-[var(--neutral-900)] mb-4">
                     Tu AI Buddy
@@ -232,11 +232,11 @@ export function AdopcionDiariaClient() {
               </AnimatedSection>
 
               {/* Tarjeta Rituales */}
-              <AnimatedSection animation="slideUp" delay={0.2}>
+              <AnimatedSection variant="slideUp" delay={0.2}>
                 <Card variant="glass" hover={true} className="h-full flex flex-col p-8">
-                  <div className="bg-[var(--primary-100)] text-[var(--primary-600)] 
+                  <div className="bg-[var(--primary-100)] text-[var(--primary-600)]
                     p-4 rounded-full mb-6 w-fit">
-                    <Calendar size={32} strokeWidth={2} />
+                    <Calendar size={32} />
                   </div>
                   <h3 className="text-2xl font-semibold text-[var(--neutral-900)] mb-4">
                     Rituales de Adopción
@@ -271,7 +271,7 @@ export function AdopcionDiariaClient() {
         {/* Biblioteca de Prompts */}
         <section className="py-12 md:py-16 bg-[var(--neutral-100)]">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--neutral-900)] text-center mb-4">
                 Biblioteca de Prompts
               </h2>
@@ -283,7 +283,7 @@ export function AdopcionDiariaClient() {
             {/* Por cada área: Operaciones, Ventas, RR.HH. */}
             {areas.map((area, areaIdx) => (
               <div key={area.id} className="mb-12 last:mb-0">
-                <AnimatedSection animation="slideUp" delay={0.1 + areaIdx * 0.05}>
+                <AnimatedSection variant="slideUp" delay={0.1 + areaIdx * 0.05}>
                   <h3 className="text-2xl font-bold text-[var(--neutral-900)] mb-6 flex items-center gap-3">
                     <area.icon size={28} className="text-[var(--primary-600)]" />
                     {area.title}
@@ -291,7 +291,7 @@ export function AdopcionDiariaClient() {
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {area.prompts.map((prompt, promptIdx) => (
-                      <AnimatedSection key={promptIdx} animation="slideUp" 
+                      <AnimatedSection key={promptIdx} variant="slideUp"
                         delay={0.15 + promptIdx * 0.05}>
                         <Card hover={true} className="h-full flex flex-col p-6">
                           <h4 className="text-lg font-semibold text-[var(--neutral-900)] mb-2">
@@ -337,12 +337,12 @@ export function AdopcionDiariaClient() {
         {/* Aviso de Cumplimiento */}
         <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <Card className="border-2 border-[var(--primary-600)]/20 bg-[var(--primary-100)]/30">
                 <div className="flex items-start gap-4">
-                  <div className="bg-[var(--primary-100)] text-[var(--primary-600)] 
+                  <div className="bg-[var(--primary-100)] text-[var(--primary-600)]
                     p-3 rounded-full flex-shrink-0">
-                    <Shield size={24} strokeWidth={2} />
+                    <Shield size={24} />
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-[var(--neutral-900)] mb-2">

@@ -5,14 +5,15 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "clean": "rimraf dist"
+    "build": "npx tsc",
+    "dev": "npx tsc --watch",
+    "clean": "npx rimraf dist"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "rimraf": "^5.0.5",
+  "dependencies": {
     "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.5"
   }
 }
 

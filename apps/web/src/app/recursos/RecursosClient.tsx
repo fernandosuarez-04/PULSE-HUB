@@ -127,7 +127,7 @@ export function RecursosClient() {
         {/* Cursos Disponibles */}
         <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <div className="flex items-center gap-3 mb-8">
                 <GraduationCap size={32} className="text-[var(--primary-600)]" />
                 <h2 className="text-3xl font-bold text-[var(--neutral-900)]">
@@ -138,7 +138,7 @@ export function RecursosClient() {
 
             <div className="space-y-6">
               {cursos.map((curso, index) => (
-                <AnimatedSection key={curso.id} animation="slideUp" delay={0.15 + index * 0.1}>
+                <AnimatedSection key={curso.id} variant="slideUp" delay={0.15 + index * 0.1}>
                   <Card hover={true} className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                       {/* Contenido del Curso */}
@@ -183,7 +183,7 @@ export function RecursosClient() {
         {/* Guías Descargables */}
         <section className="py-12 md:py-16 bg-[var(--neutral-100)]">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <div className="flex items-center gap-3 mb-8">
                 <BookOpen size={32} className="text-[var(--primary-600)]" />
                 <h2 className="text-3xl font-bold text-[var(--neutral-900)]">
@@ -194,7 +194,7 @@ export function RecursosClient() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {guias.map((guia, index) => (
-                <AnimatedSection key={guia.id} animation="slideUp" delay={0.15 + index * 0.1}>
+                <AnimatedSection key={guia.id} variant="slideUp" delay={0.15 + index * 0.1}>
                   <Card hover={true} className="h-full flex flex-col p-6">
                     {/* Badge de Tipo */}
                     <div className="mb-4">
@@ -233,7 +233,7 @@ export function RecursosClient() {
         {/* CTA Biblioteca de Prompts */}
         <section className="py-12 md:py-16 bg-white text-center">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-            <AnimatedSection animation="slideUp" delay={0.1}>
+            <AnimatedSection variant="slideUp" delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--neutral-900)] mb-6">
                 ¿Buscas Prompts Listos?
               </h2>
