@@ -1,0 +1,33 @@
+# netlify.toml - Configuración para deploy de PULSE HUB
+
+[build]
+  # Base directory apunta a la raíz del monorepo
+  base = "/"
+
+  # Build command debe construir el shared package primero, luego el web app
+  command = "npm run build --workspace=packages/shared && npm run build --workspace=apps/web"
+
+  # Directorio de publicación
+  publish = "apps/web/.next"
+
+# Variables de entorno para producción
+[context.production.environment]
+  NEXT_PUBLIC_API_URL = "https://api.pulse-hub-1.netlify.app"
+  NEXT_PUBLIC_APP_NAME = "PULSE HUB"
+  NODE_VERSION = "20"
+
+# Variables de entorno para deploy previews
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_API_URL = "https://pulse-hub-1.netlify.app"
+  NEXT_PUBLIC_APP_NAME = "PULSE HUB"
+  NODE_VERSION = "20"
+
+# Variables de entorno para branch deploys
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_API_URL = "https://pulse-hub-1.netlify.app"
+  NEXT_PUBLIC_APP_NAME = "PULSE HUB"
+  NODE_VERSION = "20"
+
+# Plugin de Next.js para Netlify
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
