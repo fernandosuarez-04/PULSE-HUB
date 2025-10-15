@@ -6,4 +6,5 @@ export * from './ParticlesBackground';
 export * from './AnimatedSection';
 export * from './Footer';
 export * from './AnnouncementBanner';
+export * from './AIChat';
 

@@ -15,12 +15,12 @@ export const errorHandler = (
   const statusCode = err.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR;
   const code = err.code || ERROR_CODES.INTERNAL_ERROR;
 
-  console.error('Error:', {
-    message: err.message,
-    stack: err.stack,
-    url: req.url,
-    method: req.method,
-  });
+  // console.error('Error:', {
+  //   message: err.message,
+  //   stack: err.stack,
+  //   url: req.url,
+  //   method: req.method,
+  // });
 
   res.status(statusCode).json({
     success: false,

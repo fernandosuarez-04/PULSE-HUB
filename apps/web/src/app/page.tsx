@@ -26,7 +26,7 @@ import { Button, Card, WavesSVG, Navbar, ParticlesBackground, AnimatedSection, A
 // Note: AnimatedSection is now imported from shared components
 
 // Counter Animation Component
-const CounterAnimation = ({ target, suffix = '', prefix = '' }: { target: number; suffix?: string; prefix?: string }) => {
+const CounterAnimation = React.memo(({ target, suffix = '', prefix = '' }: { target: number; suffix?: string; prefix?: string }) => {
   const [count, setCount] = useState(0);
   const ref = React.useRef(null);
   const isInView = useInView(ref, { once: true });
@@ -53,7 +53,7 @@ const CounterAnimation = ({ target, suffix = '', prefix = '' }: { target: number
   }, [isInView, target]);
 
   return <span ref={ref}>{prefix}{count}{suffix}</span>;
-};
+});
 
 export default function Home() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
