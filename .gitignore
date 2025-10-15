@@ -40,8 +40,8 @@ coverage/
 logs/
 *.log
 
-# Large media files
-*.mp4
+# Large media files (handled by Git LFS)
+# *.mp4 - Now handled by Git LFS
 *.mov
 *.avi
 *.mkv
