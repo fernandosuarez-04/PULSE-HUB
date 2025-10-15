@@ -440,6 +440,7 @@ export default function Home() {
                   onClick={prevTestimonial}
                   className="w-12 h-12 rounded-full bg-[var(--neutral-100)] hover:bg-[var(--primary-100)] text-[var(--neutral-600)] hover:text-[var(--primary-600)] transition-colors flex items-center justify-center"
                   aria-label="Previous testimonial"
+                  suppressHydrationWarning
                 >
                   <ChevronLeft size={24} />
                 </button>
@@ -455,6 +456,7 @@ export default function Home() {
                           : 'bg-[var(--neutral-300)]'
                       }`}
                       aria-label={`Go to testimonial ${idx + 1}`}
+                      suppressHydrationWarning
                     />
                   ))}
                 </div>
@@ -463,6 +465,7 @@ export default function Home() {
                   onClick={nextTestimonial}
                   className="w-12 h-12 rounded-full bg-[var(--neutral-100)] hover:bg-[var(--primary-100)] text-[var(--neutral-600)] hover:text-[var(--primary-600)] transition-colors flex items-center justify-center"
                   aria-label="Next testimonial"
+                  suppressHydrationWarning
                 >
                   <ChevronRight size={24} />
                 </button>

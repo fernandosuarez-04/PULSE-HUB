@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Loader2, WifiOff, Mic, MicOff, Volume2 } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
+import { VoiceInterface } from './VoiceInterface';
 import { useVoiceRecognition } from './useVoiceRecognition';
 import { useVoiceSynthesis } from './useVoiceSynthesis';
 import type { UseAIChatReturn } from './useAIChat';

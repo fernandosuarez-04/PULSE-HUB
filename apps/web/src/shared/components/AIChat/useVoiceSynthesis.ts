@@ -39,9 +39,9 @@ export interface UseVoiceSynthesisReturn {
 
 const DEFAULT_CONFIG: Required<VoiceSynthesisConfig> = {
   lang: 'es-ES',
-  rate: 0.9, // Slightly slower for clarity and warmth
-  pitch: 1.05, // Slightly higher for warm, professional tone
-  volume: 1.0, // Full volume
+  rate: 0.85, // Slower for a sweeter, more gentle tone
+  pitch: 1.15, // Higher pitch for a softer, sweeter female voice
+  volume: 0.9, // Slightly lower volume for a gentler sound
 };
 
 /**
@@ -82,65 +82,84 @@ function cleanTextForSpeech(text: string): string {
 }
 
 /**
- * Selects the best Spanish voice available.
+ * Selects the best Spanish FEMALE voice available with sweet, natural tone.
  *
  * Priority:
- * 1. Google female Spanish voices
- * 2. Microsoft female Spanish voices (Helena, Laura)
- * 3. Any quality Spanish voice (non-male)
- * 4. Any Spanish voice
- * 5. Fallback to first available
+ * 1. Microsoft Sabina (Mexican Spanish, sweetest voice) 🌸
+ * 2. Microsoft Laura (softer than Helena)
+ * 3. Google Spanish voices (natural and sweet-sounding)
+ * 4. Any explicit female Spanish voice
+ * 5. Any Spanish voice (excluding male)
+ * 6. Fallback to first available
  */
 function selectBestSpanishVoice(
   voices: SpeechSynthesisVoice[]
 ): SpeechSynthesisVoice | null {
   if (voices.length === 0) return null;
 
-  // Priority 1: Google female Spanish voices
-  const googleVoices = voices.filter(
-    (voice) =>
-      voice.lang.startsWith('es') &&
-      voice.name.toLowerCase().includes('google') &&
-      (voice.name.toLowerCase().includes('female') ||
-        voice.name.toLowerCase().includes('mujer') ||
-        !voice.name.toLowerCase().includes('male'))
-  );
-
-  // Priority 2: Microsoft female Spanish voices
-  const microsoftVoices = voices.filter(
+  // Priority 1: Microsoft Sabina (Mexican Spanish, very sweet and warm) 🥇
+  const microsoftSabina = voices.filter(
     (voice) =>
       voice.lang.startsWith('es') &&
       voice.name.toLowerCase().includes('microsoft') &&
-      (voice.name.toLowerCase().includes('female') ||
-        voice.name.toLowerCase().includes('helena') ||
-        voice.name.toLowerCase().includes('laura'))
+      voice.name.toLowerCase().includes('sabina')
   );
 
-  // Priority 3: Any quality Spanish voice (non-male)
-  const qualityVoices = voices.filter(
+  // Priority 2: Microsoft Laura (softer female voice)
+  const microsoftLaura = voices.filter(
     (voice) =>
-      voice.lang.startsWith('es') && !voice.name.toLowerCase().includes('male')
+      voice.lang.startsWith('es') &&
+      voice.name.toLowerCase().includes('microsoft') &&
+      voice.name.toLowerCase().includes('laura')
   );
 
-  // Priority 4: Any Spanish voice
-  const spanishVoices = voices.filter((voice) => voice.lang.startsWith('es'));
+  // Priority 3: Google Spanish voices (most natural)
+  const googleVoices = voices.filter(
+    (voice) =>
+      voice.lang.startsWith('es') &&
+      voice.name.toLowerCase().includes('google')
+  );
+
+  // Priority 4: Any explicit female Spanish voice
+  const explicitFemaleVoices = voices.filter(
+    (voice) =>
+      voice.lang.startsWith('es') &&
+      (voice.name.toLowerCase().includes('female') ||
+        voice.name.toLowerCase().includes('mujer'))
+  );
+
+  // Priority 5: Any Spanish voice excluding male names
+  const nonMaleVoices = voices.filter(
+    (voice) =>
+      voice.lang.startsWith('es') && 
+      !voice.name.toLowerCase().includes('male') &&
+      !voice.name.toLowerCase().includes('pablo') &&
+      !voice.name.toLowerCase().includes('raul') &&
+      !voice.name.toLowerCase().includes('mark') &&
+      !voice.name.toLowerCase().includes('david') &&
+      !voice.name.toLowerCase().includes('helena') // Helena es más formal, evitarla
+  );
 
   // Select the best available
-  if (googleVoices.length > 0) {
-    console.log('✅ Google voice selected:', googleVoices[0].name);
+  if (microsoftSabina.length > 0) {
+    console.log('✅ Microsoft Sabina selected (sweetest voice) 🌸:', microsoftSabina[0].name);
+    return microsoftSabina[0];
+  } else if (microsoftLaura.length > 0) {
+    console.log('✅ Microsoft Laura selected (soft & sweet):', microsoftLaura[0].name);
+    return microsoftLaura[0];
+  } else if (googleVoices.length > 0) {
+    console.log('✅ Google voice selected (natural):', googleVoices[0].name);
     return googleVoices[0];
-  } else if (microsoftVoices.length > 0) {
-    console.log('✅ Microsoft voice selected:', microsoftVoices[0].name);
-    return microsoftVoices[0];
-  } else if (qualityVoices.length > 0) {
-    console.log('✅ Quality voice selected:', qualityVoices[0].name);
-    return qualityVoices[0];
-  } else if (spanishVoices.length > 0) {
-    console.log('⚠️ Basic Spanish voice selected:', spanishVoices[0].name);
-    return spanishVoices[0];
+  } else if (explicitFemaleVoices.length > 0) {
+    console.log('✅ Female voice selected:', explicitFemaleVoices[0].name);
+    return explicitFemaleVoices[0];
+  } else if (nonMaleVoices.length > 0) {
+    console.log('✅ Non-male voice selected:', nonMaleVoices[0].name);
+    return nonMaleVoices[0];
   } else {
-    console.warn('⚠️ No Spanish voice found, using default');
-    return voices[0];
+    console.warn('⚠️ No preferred voice found, using first Spanish voice');
+    const anySpanish = voices.find((v) => v.lang.startsWith('es'));
+    return anySpanish || voices[0];
   }
 }
 
@@ -378,6 +397,8 @@ export function useVoiceSynthesis(
     availableVoices,
     speak,
     stop,
+    warmUp,
+    enable,
     error,
   };
 }

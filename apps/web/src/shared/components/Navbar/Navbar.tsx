@@ -12,7 +12,12 @@ import { cn } from '@/shared/utils/cn';
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,7 +66,7 @@ const Navbar: React.FC = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = mounted && pathname === link.href;
               return (
                 <Link
                   key={link.href}
@@ -111,7 +116,7 @@ const Navbar: React.FC = () => {
           >
             <div className="container mx-auto px-4 py-4 space-y-2">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href;
+                const isActive = mounted && pathname === link.href;
                 return (
                   <Link
                     key={link.href}

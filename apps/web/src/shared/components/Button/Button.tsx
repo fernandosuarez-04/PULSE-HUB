@@ -86,7 +86,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {variant === 'secondary' && <RippleEffect color="rgba(31, 90, 246, 0.2)" />}
         
         {/* Contenido del botón */}
-        <span className="relative z-10 flex items-center justify-center gap-2">
+        <span className="relative z-10 flex items-center justify-center gap-2" suppressHydrationWarning>
           {children}
         </span>
         
