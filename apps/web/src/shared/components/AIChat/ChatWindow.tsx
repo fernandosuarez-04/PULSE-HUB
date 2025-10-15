@@ -162,7 +162,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
           className="fixed bottom-6 right-6 w-[400px] max-h-[600px] min-h-[500px]
-            bg-white rounded-[var(--radius-lg)] shadow-2xl
+            bg-white rounded-3xl shadow-2xl
             flex flex-col overflow-hidden z-[9999]
             border border-[var(--neutral-200)]
             lg:w-[400px] lg:max-h-[600px] lg:min-h-[500px]
@@ -270,7 +270,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     </div>
-                    <div className="bg-[var(--neutral-100)] rounded-[var(--radius-md)]
+                    <div className="bg-[var(--neutral-100)] rounded-2xl
                       px-4 py-3 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-[var(--neutral-400)]
                         animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -289,7 +289,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
             {/* Error message */}
             {chat.error && (
               <div className="bg-[var(--accent-red)]/10 text-[var(--accent-red)]
-                px-4 py-3 rounded-[var(--radius-md)] text-sm flex items-center gap-2">
+                px-4 py-3 rounded-2xl text-sm flex items-center gap-2">
                 <WifiOff size={16} />
                 <span>{chat.error}</span>
                 {!chat.isConnected && (
@@ -316,7 +316,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
             {/* Voice recognition error */}
             {voice.error && (
               <div className="mb-3 px-3 py-2 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
-                rounded-[var(--radius-md)] text-xs flex items-center gap-2">
+                rounded-2xl text-xs flex items-center gap-2">
                 <WifiOff size={14} />
                 <span>{voice.error}</span>
               </div>
@@ -325,7 +325,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
             {/* Listening indicator */}
             {voice.isListening && (
               <div className="mb-3 px-3 py-2 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
-                rounded-[var(--radius-md)] text-xs flex items-center gap-2">
+                rounded-2xl text-xs flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[var(--accent-red)] animate-pulse" />
                 <span className="font-medium">Escuchando...</span>
               </div>
@@ -333,7 +333,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
 
             {/* Voice synthesis enable suggestion */}
             {synthesis.error && (
-              <div className="mb-3 px-3 py-2 bg-[var(--primary-50)] text-[var(--primary-700)] rounded-[var(--radius-md)] text-xs flex items-center gap-2">
+              <div className="mb-3 px-3 py-2 bg-[var(--primary-50)] text-[var(--primary-700)] rounded-2xl text-xs flex items-center gap-2">
                 <Volume2 size={14} />
                 <span className="flex-1">{synthesis.error}</span>
                 {(synthesis as any).enable ? (
@@ -374,7 +374,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                 placeholder="Escribe tu pregunta..."
                 disabled={!chat.isConnected || chat.isTyping || voice.isListening}
                 className="flex-1 px-3 py-2.5 border border-[var(--neutral-200)]
-                  rounded-[var(--radius-md)] text-sm
+                  rounded-2xl text-sm
                   focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]
                   focus:border-transparent
                   disabled:opacity-50 disabled:cursor-not-allowed
@@ -391,7 +391,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                   type="button"
                   onClick={handleVoiceToggle}
                   disabled={!chat.isConnected || chat.isTyping}
-                  className={`px-3 py-2.5 rounded-[var(--radius-md)]
+                  className={`px-3 py-2.5 rounded-2xl
                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                     flex items-center justify-center min-w-[40px]
                     lg:px-4 lg:py-2.5 lg:min-w-[44px]
@@ -412,7 +412,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                 type="submit"
                 disabled={!chat.isConnected || chat.isTyping || !inputValue.trim() || voice.isListening}
                 className="px-3 py-2.5 bg-[var(--primary-600)] text-white
-                  rounded-[var(--radius-md)] hover:bg-[var(--primary-600)]/90
+                  rounded-2xl hover:bg-[var(--primary-600)]/90
                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                   flex items-center justify-center min-w-[40px]
                   lg:px-4 lg:py-2.5 lg:min-w-[44px]

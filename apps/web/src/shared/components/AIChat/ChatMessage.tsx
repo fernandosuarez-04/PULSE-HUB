@@ -46,7 +46,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
       {/* Message content */}
       <div
-        className={`flex-1 max-w-[75%] rounded-[var(--radius-md)] px-4 py-3 ${
+        className={`flex-1 max-w-[75%] rounded-2xl px-4 py-3 ${
           isUser
             ? 'bg-[var(--primary-600)] text-white'
             : 'bg-[var(--neutral-100)] text-[var(--neutral-900)]'

@@ -21,7 +21,7 @@ import {
   Search, Palette, Rocket, ChevronLeft, ChevronRight,
   Mail, Linkedin
 } from 'lucide-react';
-import { Button, Card, WavesSVG, Navbar, ParticlesBackground, AnimatedSection, AnnouncementBanner, Footer } from '@/shared/components';
+import { Button, Card, WavesSVG, Navbar, ParticlesBackground, AnimatedSection, AnnouncementBanner, Footer, CustomVideoPlayer } from '@/shared/components';
 
 // Note: AnimatedSection is now imported from shared components
 
@@ -190,13 +190,10 @@ export default function Home() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <AnimatedSection>
               <div className="max-w-4xl mx-auto">
-                <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: '56.25%' }}>
-                  <iframe
-                    className="absolute top-0 left-0 w-full h-full"
-                    src="https://www.youtube.com/embed/LZ5rDmMSKCc"
-                    title="Pulse Hub Video"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
+                <div className="relative w-full rounded-xl overflow-hidden shadow-2xl aspect-video">
+                  <CustomVideoPlayer
+                    src="/Video.mp4"
+                    className="w-full h-full"
                   />
                 </div>
               </div>
