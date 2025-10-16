@@ -344,13 +344,18 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
             {/* Listening indicator */}
             {voice.isListening && (
               <div className="mb-3 px-4 py-3 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
-                rounded-2xl text-sm flex items-center gap-3 border border-[var(--accent-red)]/20">
-                <div className="flex gap-1">
-                  <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '0ms' }} />
-                  <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '150ms' }} />
-                  <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '300ms' }} />
+                rounded-2xl text-sm flex flex-col gap-2 border border-[var(--accent-red)]/20">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1">
+                    <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '0ms' }} />
+                    <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '150ms' }} />
+                    <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '300ms' }} />
+                  </div>
+                  <span className="font-semibold">🎤 Escuchando... Habla ahora</span>
                 </div>
-                <span className="font-semibold">🎤 Escuchando... Habla ahora</span>
+                <p className="text-xs text-[var(--neutral-600)]">
+                  💡 Habla claramente cerca del micrófono. Abre la consola del navegador para ver logs de diagnóstico.
+                </p>
               </div>
             )}
 
