@@ -12,11 +12,11 @@
 import React, { useState } from 'react';
 import { ChatBubble } from './ChatBubble';
 import { ChatWindow } from './ChatWindow';
-import { useAIChatWebSocket } from './useAIChatWebSocket';
+import { useAIChat } from './useAIChat';
 
 export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const chat = useAIChatWebSocket();
+  const chat = useAIChat();
 
   const handleToggle = () => {
     setIsOpen((prev) => !prev);

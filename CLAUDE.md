@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Key Features**:
 - Marketing website with 8 pages (homepage, about, 3 pillars, case studies, resources, contact)
-- Voice-enabled conversational AI agent with WebSocket backend
+- Voice-enabled conversational AI agent with REST API backend
 - Monorepo architecture with separate web and API applications
 - Screaming Architecture pattern (organized by business features, not technical layers)
 
@@ -58,7 +58,7 @@ The codebase follows **Screaming Architecture** (Robert C. Martin):
 │   │   └── auth.types.ts
 │   ├── users/
 │   ├── contact/
-│   └── ai-chat/           # WebSocket AI chat integration
+│   └── ai-chat/           # REST API AI chat integration
 ├── core/                   # Middleware, config, utils
 └── shared/                 # Shared types and constants
 ```
@@ -139,7 +139,7 @@ npm run evals      # Run evaluations
 npm run tracing:demo
 ```
 
-**Note**: The standalone agent is separate from the web app's integrated AI chat. The web app (`apps/web`) has its own AI chat feature using WebSocket connections to the backend API.
+**Note**: The standalone agent is separate from the web app's integrated AI chat. The web app (`apps/web`) has its own AI chat feature using REST API connections to the backend.
 
 See `agente-ia-conversacional-main/CLAUDE.md` for detailed guidance on the standalone agent.
 
@@ -211,7 +211,7 @@ Colors are defined as CSS variables in `apps/web/src/app/globals.css`:
 - **WavesSVG** - Animated wave graphics for hero sections
 - **AnimatedSection** - Scroll-triggered animations with variants
 - **AnnouncementBanner** - Top banner for announcements
-- **AIChat** - Floating chat bubble with voice recognition and WebSocket integration
+- **AIChat** - Floating chat bubble with voice recognition and REST API integration
 
 **Component Pattern**:
 ```
@@ -254,8 +254,8 @@ ComponentName/
 - **Node.js 20 LTS** - JavaScript runtime
 - **Express 4** - Web framework
 - **TypeScript** - Static typing
-- **WebSocket (ws)** - Real-time AI chat
-- **OpenAI API** - AI chat capabilities
+- **OpenAI API** - AI chat capabilities (GPT-4o-mini)
+- **ElevenLabs API** - Text-to-speech for voice responses
 - **Nodemailer** - Email notifications
 - **Zod** - Schema validation
 - **Helmet** - Security middleware
@@ -272,24 +272,24 @@ ComponentName/
 
 ### Architecture
 
-The AI chat feature uses a WebSocket-based architecture connecting the Next.js frontend to the Express backend:
+The AI chat feature uses a **REST API architecture** connecting the Next.js frontend to the Express backend:
 
 **Backend** (`apps/api/src/features/ai-chat/`):
+- `ai-chat.controller.ts` - REST API controller for message handling
+- `ai-chat.routes.ts` - Express routes definition
 - `ai-chat.service.ts` - Main service managing conversations and voice synthesis
 - `services/openai-service.ts` - OpenAI API integration with function calling (GPT-4o-mini)
 - `services/elevenlabs-service.ts` - **ElevenLabs TTS integration** for high-quality voice output
 - `tools/coda.ts` - Coda API integration for saving inquiries
-- WebSocket server in `server.ts` for real-time communication on port 4000
 
 **Frontend** (`apps/web/src/shared/components/AIChat/`):
 - `AIChat.tsx` - Main container component with state management
 - `ChatBubble.tsx` - Floating action button (bottom-right)
 - `ChatWindow.tsx` - Chat interface with voice controls
 - `ChatMessage.tsx` - Individual message rendering
-- `useAIChatWebSocket.ts` - WebSocket hook with ElevenLabs audio support
-- `useElevenLabsAudio.ts` - Audio playback from base64-encoded ElevenLabs audio
+- `useAIChat.ts` - REST API hook with ElevenLabs audio support
+- `useHybridVoice.ts` - Hybrid audio playback (ElevenLabs + Web Speech API fallback)
 - `useVoiceRecognition.ts` - Browser Web Speech API for voice input (Spanish)
-- ~~`useVoiceSynthesis.ts`~~ - *Deprecated: Replaced by ElevenLabs for superior quality*
 
 ### Key Features
 
@@ -297,29 +297,32 @@ The AI chat feature uses a WebSocket-based architecture connecting the Next.js f
 - **Voice Output**: High-quality text-to-speech using **ElevenLabs** AI voices
   - Natural Spanish voice synthesis
   - Automatic audio playback with agent responses
-  - Base64-encoded audio transmitted via WebSocket
-  - Fallback to text-only if ElevenLabs not configured
-- **Real-time Messaging**: WebSocket connection for instant bidirectional communication
+  - Base64-encoded audio transmitted via REST API
+  - Fallback to Web Speech API if ElevenLabs not configured
+- **REST API Communication**: HTTP requests for reliable message exchange
 - **Function Calling**: OpenAI automatically calls tools (e.g., save to Coda, search knowledge base)
 - **Session Management**: Each chat session has a unique ID (UUID)
 - **Conversation History**: Maintains context across messages (last 10 messages)
 - **Persistent UI**: Floating bubble accessible from all pages
 
-### WebSocket Message Flow
+### REST API Message Flow
 
 ```typescript
-// Client → Server (user message)
-ws.send(JSON.stringify({
-  type: 'user_message',
-  text: userMessage,
-  sessionId: sessionId
-}));
-
-// Server → Client (agent response)
+// Client → Server (POST request)
+POST /api/v1/ai-chat/message
 {
-  type: 'message',
-  text: agentResponse,
-  sessionId: sessionId
+  message: "¿Qué es PULSE HUB?",
+  sessionId: "session-123"
+}
+
+// Server → Client (JSON response)
+{
+  success: true,
+  data: {
+    text: "PULSE HUB es una plataforma...",
+    audio: "base64-encoded-mp3-audio",  // Optional
+    sessionId: "session-123"
+  }
 }
 ```
 
@@ -341,13 +344,13 @@ The AIChat component is placed in the root layout (`apps/web/src/app/layout.tsx`
 
 **Development**:
 - Frontend: `http://localhost:3000`
-- Backend WebSocket: `ws://localhost:4000`
+- Backend API: `http://localhost:4000/api/v1/ai-chat`
 
 **Production**:
-- Update WebSocket URL in `useAIChat.ts` to production backend
+- Update `NEXT_PUBLIC_API_URL` in frontend `.env` to production backend
 - Ensure CORS settings allow frontend domain
-- Use secure WebSocket (`wss://`) in production
 - Voice API requires HTTPS (except localhost)
+- Session management: Consider Redis for production scalability
 
 ## 📋 Environment Variables
 
@@ -464,7 +467,7 @@ Package names:
 
 1. **AnimatedSection Prop**: Use `variant` not `animation`
 2. **Shared Package**: Must be built before running dev mode (handled by `predev`)
-3. **WebSocket URL**: Frontend connects to `ws://localhost:4000` (not `/api`)
+3. **REST API URL**: Frontend connects to `http://localhost:4000/api` (configurable via `NEXT_PUBLIC_API_URL`)
 4. **CSS Variables**: Always use `var(--variable-name)` syntax
 5. **Barrel Exports**: Update `index.ts` when adding new components
 
@@ -493,13 +496,13 @@ npm run clean
 npm run build
 ```
 
-**AI Chat WebSocket not connecting**:
+**AI Chat REST API not working**:
 - Verify backend is running on port 4000
-- Check WebSocket server is initialized in `apps/api/src/server.ts`
+- Check REST API routes are registered in `apps/api/src/server.ts`
 - Ensure OPENAI_API_KEY is set in backend `.env`
-- Check browser console for connection errors
-- Frontend connects to `ws://localhost:4000` (not `/api` path)
-- In production, use `wss://` protocol with valid SSL certificate
+- Check browser DevTools Network tab for failed requests
+- Verify `NEXT_PUBLIC_API_URL` is set correctly in frontend `.env.local`
+- Test endpoint directly: `curl http://localhost:4000/api/v1/ai-chat/health`
 
 **Voice recognition not working**:
 - Only works in Chrome, Edge, Safari (WebKit-based browsers)
@@ -591,12 +594,13 @@ The frontend can be deployed to Vercel (recommended) or Netlify:
 **Recommended providers**:
 - Railway - PostgreSQL + Node.js hosting
 - Render - Automatic deployments from Git
-- Fly.io - Edge deployment with WebSocket support
+- Fly.io - Edge deployment with global distribution
+- Heroku - Simple deployment with managed PostgreSQL
 
 **Requirements**:
 - Node.js 20 LTS
-- WebSocket support (ensure provider supports WS connections)
-- Environment variables configured for OpenAI, Coda, email
+- Environment variables configured for OpenAI, ElevenLabs, Coda, email
+- Redis (optional) for session management in production
 
 ### Database
 
@@ -624,11 +628,11 @@ The AI Chat uses **ElevenLabs** for high-quality text-to-speech instead of brows
 ### Architecture Flow
 
 ```
-1. User sends message → Backend (WebSocket)
+1. User sends message → Backend (REST API POST)
 2. OpenAI generates text response
 3. ElevenLabs converts text → MP3 audio
 4. Audio encoded to Base64
-5. Sent to frontend via WebSocket
+5. Sent to frontend in JSON response
 6. Frontend decodes Base64 → Blob
 7. Audio plays automatically
 ```
@@ -672,4 +676,6 @@ To change voices, visit https://elevenlabs.io/app/voice-lab and:
 ---
 
 **Last Updated**: January 2025
-**Version**: 1.4 - Added ElevenLabs TTS integration, WebSocket audio streaming, and voice configuration
+**Version**: 2.0 - Migrated from WebSocket to REST API architecture with ElevenLabs TTS integration
+
+For detailed migration information, see: `docs/guides/AI-CHAT-REST-MIGRATION.md`
