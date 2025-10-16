@@ -9,7 +9,8 @@
  * - Fallback: Use browser SpeechSynthesis API
  * - Automatic barge-in (stop audio on interruption)
  * - Unified interface for both voice systems
- * - Error handling and logging
+ * - Robust error handling (AbortError expected during interruption)
+ * - Optimized: Reuses single Audio element
  */
 
 'use client';
@@ -37,62 +38,72 @@ export function useHybridVoice(): UseHybridVoiceReturn {
   // Web Speech API fallback
   const webSpeechSynthesis = useVoiceSynthesis();
 
-  // Ref to current audio element (for ElevenLabs)
+  // Reusable audio element (optimización: no crear uno nuevo cada vez)
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Ref to current object URL for cleanup
+  // Current object URL for cleanup
   const objectUrlRef = useRef<string | null>(null);
 
   // Track which system is currently speaking
   const currentSystemRef = useRef<'elevenlabs' | 'webspeech' | null>(null);
 
-  // Track if audio is currently loading (prevent premature cleanup)
-  const isLoadingRef = useRef(false);
+  // Track active playback promise to handle interruptions gracefully
+  const playbackPromiseRef = useRef<Promise<void> | null>(null);
+
+  // Flag to indicate intentional stop (barge-in) vs error
+  const isIntentionalStopRef = useRef(false);
 
   /**
-   * Cleanup function to revoke object URLs and stop audio
+   * Safely stops audio playback without throwing errors
    */
-  const cleanup = useCallback(() => {
-    // Don't cleanup if audio is still loading
-    if (isLoadingRef.current) {
-      console.warn('⚠️ Audio still loading (flag=true), deferring cleanup');
-      console.trace('Cleanup attempt blocked:');
-      return;
+  const stopAudioSafely = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // Set flag to indicate this is an intentional stop
+    isIntentionalStopRef.current = true;
+
+    // Only pause if not already paused (avoid redundant pause() calls)
+    if (!audio.paused) {
+      audio.pause();
     }
 
-    console.log(`🧹 Cleaning up audio resources (flag=${isLoadingRef.current})`);
+    // Reset to beginning
+    audio.currentTime = 0;
+  }, []);
 
-    // Stop and cleanup audio element (ElevenLabs)
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current.src = '';
-      audioRef.current = null;
-    }
-
-    // Revoke object URL to free memory
+  /**
+   * Cleanup old object URL
+   */
+  const cleanupObjectUrl = useCallback(() => {
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
     }
-
-    // Stop Web Speech API if speaking
-    if (currentSystemRef.current === 'webspeech') {
-      webSpeechSynthesis.stop();
-    }
-
-    currentSystemRef.current = null;
-  }, [webSpeechSynthesis]);
+  }, []);
 
   /**
    * Stops all voice output (ElevenLabs or Web Speech API)
    */
   const stopSpeaking = useCallback(() => {
-    cleanup();
+    console.log('⏹️ Stopping voice output (barge-in)');
+
+    // Stop ElevenLabs audio safely
+    if (currentSystemRef.current === 'elevenlabs') {
+      stopAudioSafely();
+      cleanupObjectUrl();
+    }
+
+    // Stop Web Speech API
+    if (currentSystemRef.current === 'webspeech') {
+      webSpeechSynthesis.stop();
+    }
+
+    currentSystemRef.current = null;
     setIsSpeaking(false);
     setVoiceName(null);
-    console.log('⏹️ Voice output stopped (barge-in)');
-  }, [cleanup]);
+    isIntentionalStopRef.current = false;
+  }, [stopAudioSafely, cleanupObjectUrl, webSpeechSynthesis]);
 
   /**
    * Plays audio from ElevenLabs (base64-encoded MP3)
@@ -105,61 +116,19 @@ export function useHybridVoice(): UseHybridVoiceReturn {
         return;
       }
 
+      console.log('🎙️ Playing ElevenLabs audio...');
+
+      // Stop any currently playing audio or speech
+      // But DON'T reset the intentional flag yet - we're stopping the OLD audio
+      const wasIntentional = isIntentionalStopRef.current;
+      stopSpeaking();
+
+      // Now reset for the NEW playback we're about to start
+      isIntentionalStopRef.current = false;
+
       try {
-        console.log('🎙️ Playing ElevenLabs audio...');
-        console.log(`   Audio length: ${base64Audio.length} chars`);
-
-        // Capture OLD audio element and URL for cleanup BEFORE creating new ones
-        const oldAudio = audioRef.current;
-        const oldUrl = objectUrlRef.current;
-        const oldSystem = currentSystemRef.current;
-
-        // Clear refs immediately to prevent any accidental access to old resources
-        audioRef.current = null;
-        objectUrlRef.current = null;
-
-        // Stop and cleanup OLD audio (won't affect new audio we're about to create)
-        if (oldAudio || oldSystem === 'webspeech') {
-          console.log('⏹️ Stopping previous audio before playing new one');
-
-          // Cleanup old audio element
-          if (oldAudio) {
-            oldAudio.pause();
-            oldAudio.currentTime = 0;
-            oldAudio.src = '';
-          }
-
-          // Revoke old object URL
-          if (oldUrl) {
-            URL.revokeObjectURL(oldUrl);
-          }
-
-          // Stop Web Speech API if was speaking
-          if (oldSystem === 'webspeech') {
-            webSpeechSynthesis.stop();
-          }
-
-          setIsSpeaking(false);
-          setVoiceName(null);
-        }
-
-        // Now set loading flag to protect the NEW audio we're about to create
-        isLoadingRef.current = true;
-        currentSystemRef.current = 'elevenlabs';
-        setVoiceName('ElevenLabs');
-        console.log(`🔒 Loading flag SET (true), audio protected from cleanup`);
-
-        // Convert base64 to binary
-        let binaryString: string;
-        try {
-          binaryString = atob(base64Audio);
-          console.log(`   Decoded binary length: ${binaryString.length} bytes`);
-        } catch (decodeErr) {
-          console.error('❌ Error decoding base64:', decodeErr);
-          isLoadingRef.current = false;
-          throw new Error('Invalid base64 audio data');
-        }
-
+        // Decode base64 to binary
+        const binaryString = atob(base64Audio);
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
           bytes[i] = binaryString.charCodeAt(i);
@@ -167,109 +136,121 @@ export function useHybridVoice(): UseHybridVoiceReturn {
 
         // Create blob from binary data
         const blob = new Blob([bytes], { type: 'audio/mpeg' });
-        console.log(`   Blob created: ${blob.size} bytes, type: ${blob.type}`);
+        console.log(`   Audio blob: ${blob.size} bytes`);
 
-        // Create object URL
+        // Create or reuse audio element
+        let audio = audioRef.current;
+        if (!audio) {
+          audio = new Audio();
+          audioRef.current = audio;
+          console.log('   Created new Audio element');
+        } else {
+          console.log('   Reusing existing Audio element');
+        }
+
+        // Cleanup old object URL before creating new one
+        cleanupObjectUrl();
+
+        // Create new object URL
         const url = URL.createObjectURL(blob);
         objectUrlRef.current = url;
-        console.log(`   Object URL created: ${url.substring(0, 50)}...`);
 
-        // Create audio element
-        const audio = new Audio(url);
-        audioRef.current = audio;
+        // Set new source
+        audio.src = url;
+        audio.load(); // Force load of new source
+
+        // Update state
+        currentSystemRef.current = 'elevenlabs';
+        setVoiceName('ElevenLabs');
+        setError(null);
 
         // Event handlers
         audio.onloadeddata = () => {
-          console.log('✅ ElevenLabs audio loaded, ready to play');
+          console.log('✅ Audio loaded');
         };
 
         audio.onplay = () => {
-          // Clear loading flag once playback starts
-          isLoadingRef.current = false;
-          console.log('🔓 Loading flag CLEARED (false), audio playback started');
           setIsSpeaking(true);
-          setError(null);
-          console.log('🎙️ ElevenLabs audio playing');
+          console.log('🎙️ Audio playing');
         };
 
         audio.onended = () => {
-          isLoadingRef.current = false;
+          console.log('✅ Audio finished');
           setIsSpeaking(false);
           setVoiceName(null);
-          cleanup();
-          console.log('✅ ElevenLabs audio finished');
+          currentSystemRef.current = null;
+          cleanupObjectUrl();
         };
 
         audio.onerror = (e) => {
-          isLoadingRef.current = false;
+          // Only log real errors, not interruptions
+          if (!isIntentionalStopRef.current) {
+            console.error('❌ Audio playback error:', {
+              error: e,
+              readyState: audio?.readyState,
+              networkState: audio?.networkState,
+            });
+            setError('Error al reproducir audio de ElevenLabs');
+          }
           setIsSpeaking(false);
           setVoiceName(null);
-          const errorMsg = 'Error al reproducir audio de ElevenLabs';
-          setError(errorMsg);
-
-          // Log detallado del error
-          console.error('❌ ElevenLabs audio playback error:', {
-            error: e,
-            errorType: e?.type,
-            target: e?.target,
-            currentSrc: audio?.currentSrc,
-            readyState: audio?.readyState,
-            networkState: audio?.networkState,
-          });
-
-          cleanup();
+          currentSystemRef.current = null;
         };
 
         audio.onpause = () => {
-          if (audioRef.current?.currentTime === 0) {
-            isLoadingRef.current = false;
+          // Only update state if pause was intentional (not just buffering)
+          if (isIntentionalStopRef.current || audio.ended) {
             setIsSpeaking(false);
-            setVoiceName(null);
           }
         };
 
-        // Start playback
-        audio
-          .play()
+        // Start playback with proper error handling
+        const playPromise = audio.play();
+        playbackPromiseRef.current = playPromise;
+
+        playPromise
           .then(() => {
-            console.log('✅ Audio playback started successfully');
+            console.log('✅ Playback started successfully');
+            playbackPromiseRef.current = null;
           })
           .catch((err) => {
-            isLoadingRef.current = false;
-            console.error('❌ Error starting ElevenLabs playback:', {
-              name: err?.name,
-              message: err?.message,
-              code: err?.code,
-              error: err,
-            });
+            playbackPromiseRef.current = null;
 
-            // Handle autoplay blocking
+            // AbortError is EXPECTED during barge-in, don't log as error
+            if (err.name === 'AbortError') {
+              if (isIntentionalStopRef.current) {
+                console.log('⏹️ Playback interrupted (barge-in)');
+              } else {
+                console.warn('⚠️ Playback aborted unexpectedly');
+              }
+              return; // Don't show error to user for barge-in
+            }
+
+            // Handle other errors
             if (err.name === 'NotAllowedError') {
-              setError('Audio bloqueado por el navegador. Haz clic para habilitar.');
+              console.warn('⚠️ Autoplay blocked by browser');
+              setError('Audio bloqueado. Haz clic en la página para habilitar.');
             } else if (err.name === 'NotSupportedError') {
-              setError('Formato de audio no soportado. Usando fallback.');
-              console.warn('⚠️ Audio format not supported, trying Web Speech API fallback');
+              console.error('❌ Audio format not supported');
+              setError('Formato de audio no soportado');
             } else {
-              setError('Error al reproducir audio de ElevenLabs');
+              console.error('❌ Playback error:', err);
+              setError('Error al reproducir audio');
             }
 
             setIsSpeaking(false);
             setVoiceName(null);
-            cleanup();
+            currentSystemRef.current = null;
           });
       } catch (err) {
-        isLoadingRef.current = false;
-        console.error('❌ Error processing ElevenLabs audio:', {
-          error: err,
-          message: err instanceof Error ? err.message : 'Unknown error',
-        });
+        console.error('❌ Error processing audio:', err);
         setError('Error al procesar audio');
         setIsSpeaking(false);
         setVoiceName(null);
-        cleanup();
+        currentSystemRef.current = null;
       }
     },
-    [cleanup, webSpeechSynthesis]
+    [stopSpeaking, cleanupObjectUrl]
   );
 
   /**
@@ -312,6 +293,7 @@ export function useHybridVoice(): UseHybridVoiceReturn {
       // Clear voice name when Web Speech API stops
       if (!webSpeechSynthesis.isSpeaking && isSpeaking) {
         setVoiceName(null);
+        currentSystemRef.current = null;
       }
     }
   }, [webSpeechSynthesis.isSpeaking, isSpeaking]);
@@ -321,9 +303,19 @@ export function useHybridVoice(): UseHybridVoiceReturn {
    */
   useEffect(() => {
     return () => {
-      cleanup();
+      // Stop any playing audio
+      stopSpeaking();
+
+      // Cleanup audio element
+      if (audioRef.current) {
+        audioRef.current.src = '';
+        audioRef.current = null;
+      }
+
+      // Cleanup object URL
+      cleanupObjectUrl();
     };
-  }, [cleanup]);
+  }, [stopSpeaking, cleanupObjectUrl]);
 
   return {
     isSpeaking,
