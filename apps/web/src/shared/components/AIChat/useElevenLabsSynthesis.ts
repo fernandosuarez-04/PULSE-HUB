@@ -56,9 +56,9 @@ function cleanTextForSpeech(text: string): string {
   cleaned = cleaned.replace(/\?{2,}/g, '?'); // Replace multiple question marks
   cleaned = cleaned.replace(/!{2,}/g, '!'); // Replace multiple exclamation marks
 
-  // Replace multiple line breaks with natural pauses
-  cleaned = cleaned.replace(/\n{2,}/g, '. ');
-  cleaned = cleaned.replace(/\n/g, ', ');
+  // Replace multiple line breaks with shorter pauses for faster flow
+  cleaned = cleaned.replace(/\n{2,}/g, ' ');
+  cleaned = cleaned.replace(/\n/g, ' ');
 
   // Clean punctuation spacing for natural flow
   cleaned = cleaned.replace(/\s*([.!?])\s*/g, '$1 ');
@@ -163,9 +163,9 @@ export function useElevenLabsSynthesis(): UseElevenLabsSynthesisReturn {
               text: cleanedText,
               model_id: modelId, // Use configured model (eleven_multilingual_v2)
               voice_settings: {
-                stability: 0.3, // Lower stability for more natural, less robotic sound
-                similarity_boost: 0.9, // Higher boost for more natural voice
-                style: 0.4, // Higher style for more expressive, fluid speech
+                stability: 0.4, // Slightly higher for faster, more consistent pace
+                similarity_boost: 0.85, // Balanced for speed and quality
+                style: 0.3, // Moderate style for dynamic but not slow speech
                 use_speaker_boost: true,
               },
             }),
