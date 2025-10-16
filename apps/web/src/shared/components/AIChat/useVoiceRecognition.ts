@@ -57,6 +57,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
 
   const recognitionRef = useRef<any>(null);
   const audioStreamRef = useRef<MediaStream | null>(null);
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if Speech Recognition is supported
   useEffect(() => {
@@ -68,10 +69,10 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
 
-        // Configuration
+        // Configuration optimized for mobile devices
         recognition.lang = 'es-ES'; // Spanish language
-        recognition.continuous = false; // Stop after one result
-        recognition.interimResults = false; // Only final results
+        recognition.continuous = true; // Keep listening (better for mobile)
+        recognition.interimResults = true; // Show interim results
         recognition.maxAlternatives = 1; // One alternative
 
         // Event handlers
@@ -82,15 +83,38 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
         };
 
         recognition.onresult = (event: any) => {
+          // Clear any existing silence timer
+          if (silenceTimerRef.current) {
+            clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = null;
+          }
+
+          // Get the last result (most recent)
           const result = event.results[event.results.length - 1];
           const transcriptText = result[0].transcript;
           const confidence = result[0].confidence;
+          const isFinal = result.isFinal;
 
-          // console.log(
-          //   `📝 Transcription: "${transcriptText}" (confidence: ${(confidence * 100).toFixed(1)}%)`
-          // );
+          console.log(
+            `📝 ${isFinal ? 'Final' : 'Interim'} transcription: "${transcriptText}" (confidence: ${(confidence * 100).toFixed(1)}%)`
+          );
 
+          // Update transcript (both interim and final)
           setTranscript(transcriptText);
+
+          // If final result, set a silence timer to auto-stop after 1.5 seconds
+          if (isFinal && transcriptText.trim()) {
+            silenceTimerRef.current = setTimeout(() => {
+              console.log('🔇 Silence detected, stopping recognition');
+              if (recognitionRef.current) {
+                try {
+                  recognitionRef.current.stop();
+                } catch (e) {
+                  console.error('Error stopping recognition:', e);
+                }
+              }
+            }, 1500); // Stop after 1.5s of silence
+          }
         };
 
         recognition.onerror = (event: any) => {
@@ -142,6 +166,12 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
         } catch (e) {
           // Ignore errors on cleanup
         }
+      }
+
+      // Clear silence timer
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
       }
 
       // Stop audio stream if active
@@ -244,6 +274,12 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
     }
 
     try {
+      // Clear silence timer
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
+      }
+
       recognitionRef.current.stop();
 
       // Clean up audio stream

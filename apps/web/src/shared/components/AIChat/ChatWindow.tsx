@@ -84,19 +84,27 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     }
   }, [isOpen, synthesis]);
 
-  // Handle voice transcript
+  // Handle voice transcript - show interim results
   useEffect(() => {
-    if (voice.transcript && !voice.isListening) {
-      // When voice recognition completes, set transcript to input
+    if (voice.transcript) {
+      // Always update input with current transcript (interim or final)
       setInputValue(voice.transcript);
-      voice.clearTranscript();
+    }
+  }, [voice.transcript]);
+
+  // Handle voice transcript completion - auto-submit when listening stops
+  useEffect(() => {
+    // When voice recognition stops and we have a transcript
+    if (!voice.isListening && voice.transcript && voice.transcript.trim()) {
       // Auto-submit the voice message
-      if (voice.transcript.trim() && !chat.isTyping) {
-        chat.sendMessage(voice.transcript);
+      if (!chat.isTyping) {
+        const messageToSend = voice.transcript;
+        voice.clearTranscript();
         setInputValue('');
+        chat.sendMessage(messageToSend);
       }
     }
-  }, [voice.transcript, voice.isListening, chat, voice]);
+  }, [voice.isListening, voice.transcript, chat.isTyping, chat, voice]);
 
   // Auto-speak agent responses (only new messages)
   useEffect(() => {
@@ -335,10 +343,14 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
 
             {/* Listening indicator */}
             {voice.isListening && (
-              <div className="mb-3 px-3 py-2 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
-                rounded-2xl text-xs flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[var(--accent-red)] animate-pulse" />
-                <span className="font-medium">Escuchando...</span>
+              <div className="mb-3 px-4 py-3 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
+                rounded-2xl text-sm flex items-center gap-3 border border-[var(--accent-red)]/20">
+                <div className="flex gap-1">
+                  <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '0ms' }} />
+                  <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '150ms' }} />
+                  <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '300ms' }} />
+                </div>
+                <span className="font-semibold">🎤 Escuchando... Habla ahora</span>
               </div>
             )}
 
