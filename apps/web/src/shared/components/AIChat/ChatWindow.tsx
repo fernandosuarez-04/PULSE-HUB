@@ -404,6 +404,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                   type="button"
                   onClick={handleVoiceToggle}
                   disabled={!chat.isConnected || chat.isTyping}
+                  title="Modo de voz"
                   className={`px-3 py-2.5 rounded-2xl
                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                     flex items-center justify-center min-w-[40px]
@@ -424,6 +425,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <button
                 type="submit"
                 disabled={!chat.isConnected || chat.isTyping || !inputValue.trim() || voice.isListening}
+                title="Enviar pregunta"
                 className="px-3 py-2.5 bg-[var(--primary-600)] text-white
                   rounded-2xl hover:bg-[var(--primary-600)]/90
                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed
@@ -446,11 +448,11 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               md:text-xs
               sm:text-xs
               max-sm:text-[10px] max-sm:leading-tight">
-              <span className="hidden sm:inline">Presiona Enter para enviar • Shift+Enter para nueva línea</span>
-              <span className="sm:hidden">Enter para enviar • Shift+Enter nueva línea</span>
+              <span className="hidden sm:inline">Presiona Enter para enviar tu mensaje</span>
+              <span className="sm:hidden">Enter para enviar</span>
               {voice.isSupported && (
                 <>
-                  <span className="hidden sm:inline"> • Click en micrófono para voz</span>
+                  <span className="hidden sm:inline"> • Click en micrófono para modo de voz</span>
                   <span className="sm:hidden"> • Micrófono para voz</span>
                 </>
               )}
