@@ -29,7 +29,7 @@ export interface ElevenLabsConfig {
 
 export class ElevenLabsService {
   private client: any;
-  private voiceId: string;
+  private defaultVoiceId: string;
   private modelId: string;
   private voiceSettings: {
     stability: number;
@@ -49,7 +49,7 @@ export class ElevenLabsService {
 
     // Voice ID - Rachel (default sweet Spanish female voice)
     // You can find voice IDs at: https://elevenlabs.io/app/voice-lab
-    this.voiceId = config.voiceId || '21m00Tcm4TlvDq8ikWAM'; // Rachel (English default, but works well with Spanish)
+    this.defaultVoiceId = config.voiceId || '21m00Tcm4TlvDq8ikWAM'; // Rachel (English default, but works well with Spanish)
 
     // Model ID - multilingual v2 for Spanish support
     this.modelId = config.modelId || 'eleven_multilingual_v2';
@@ -63,26 +63,30 @@ export class ElevenLabsService {
     };
 
     console.log('✅ ElevenLabs Service initialized');
-    console.log(`   - Voice ID: ${this.voiceId}`);
+    console.log(`   - Default Voice ID: ${this.defaultVoiceId}`);
     console.log(`   - Model: ${this.modelId}`);
   }
 
   /**
    * Converts text to speech and returns audio buffer
    * @param text - Text to convert to speech
+   * @param voiceId - Optional voice ID (uses default if not provided)
    * @returns Audio buffer (MP3 format)
    */
-  async textToSpeech(text: string): Promise<Buffer> {
+  async textToSpeech(text: string, voiceId?: string): Promise<Buffer> {
     try {
       if (!text || text.trim().length === 0) {
         throw new Error('Text is required for TTS');
       }
 
+      const selectedVoiceId = voiceId || this.defaultVoiceId;
+
       console.log('🎙️ ElevenLabs: Generating speech...');
       console.log(`   Text: "${text.substring(0, 50)}..."`);
+      console.log(`   Voice: ${selectedVoiceId}`);
 
       // Generate speech with streaming
-      const audioStream = await this.client.textToSpeech.convert(this.voiceId, {
+      const audioStream = await this.client.textToSpeech.convert(selectedVoiceId, {
         text: text,
         model_id: this.modelId,
         voice_settings: {
@@ -120,11 +124,12 @@ export class ElevenLabsService {
    * Converts text to speech and returns base64-encoded audio
    * Useful for JSON transmission over WebSocket
    * @param text - Text to convert to speech
+   * @param voiceId - Optional voice ID (uses default if not provided)
    * @returns Base64-encoded audio (MP3)
    */
-  async textToSpeechBase64(text: string): Promise<string> {
+  async textToSpeechBase64(text: string, voiceId?: string): Promise<string> {
     try {
-      const audioBuffer = await this.textToSpeech(text);
+      const audioBuffer = await this.textToSpeech(text, voiceId);
       const base64Audio = audioBuffer.toString('base64');
 
       console.log(`✅ Audio converted to base64 (${base64Audio.length} chars)`);
@@ -164,12 +169,20 @@ export class ElevenLabsService {
   }
 
   /**
-   * Changes the active voice
-   * @param voiceId - New voice ID
+   * Changes the default voice
+   * @param voiceId - New default voice ID
    */
-  setVoice(voiceId: string): void {
-    this.voiceId = voiceId;
-    console.log(`✅ Voice changed to: ${voiceId}`);
+  setDefaultVoice(voiceId: string): void {
+    this.defaultVoiceId = voiceId;
+    console.log(`✅ Default voice changed to: ${voiceId}`);
+  }
+
+  /**
+   * Gets the current default voice ID
+   * @returns Current default voice ID
+   */
+  getDefaultVoiceId(): string {
+    return this.defaultVoiceId;
   }
 }
 

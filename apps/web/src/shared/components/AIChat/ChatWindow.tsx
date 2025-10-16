@@ -58,18 +58,15 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   // Voice recognition hook (for user input)
   const voice = useVoiceRecognition();
 
-  // Voice synthesis hook (for agent responses) - DISABLED in favor of ElevenLabs
-  // const synthesis = useVoiceSynthesis();
-
-  // Dummy synthesis object for compatibility (ElevenLabs handles audio now)
+  // Synthesis object for UI compatibility (uses chat.isSpeaking from hybrid voice)
   const synthesis = {
-    isSupported: false,
-    isSpeaking: chat.isPlayingAudio || false,
-    selectedVoice: null,
+    isSupported: true, // Always supported now (ElevenLabs + fallback)
+    isSpeaking: chat.isSpeaking || false,
+    selectedVoice: chat.voiceName ? { name: chat.voiceName } : null,
     availableVoices: [],
-    speak: () => {},
-    stop: () => {},
-    error: null,
+    speak: () => {}, // Not needed, auto-play handled by useAIChatWebSocket
+    stop: chat.stopVoice, // Map to hybrid voice stop function
+    error: chat.voiceError,
   };
 
   // Auto-scroll to bottom when new messages arrive
@@ -109,11 +106,16 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     }
   }, [voice.transcript, voice.isListening, chat, voice]);
 
-  // Auto-speak agent responses (ElevenLabs audio is auto-played in useAIChatWebSocket)
-  // No need for manual synthesis here - ElevenLabs audio plays automatically
+  // Auto-play voice is handled automatically in useAIChatWebSocket
+  // No manual intervention needed
 
-  // BARGE-IN: This is handled by sendMessage in useAIChatWebSocket
-  // (stops audio when user sends a message)
+  // BARGE-IN: Stop voice when user starts speaking (voice recognition)
+  useEffect(() => {
+    if (voice.isListening && chat.isSpeaking) {
+      console.log('⚡ Barge-in: User started speaking, stopping agent voice');
+      chat.stopVoice();
+    }
+  }, [voice.isListening, chat]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,9 +195,9 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                   )}
                 </p>
                 {/* Voice info */}
-                {synthesis.isSupported && synthesis.selectedVoice && (
+                {chat.voiceName && (
                   <p className="text-[10px] text-white/60 mt-0.5">
-                    🎙️ {synthesis.selectedVoice.name}
+                    🎙️ {chat.voiceName}
                   </p>
                 )}
               </div>
@@ -316,36 +318,12 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               </div>
             )}
 
-            {/* Voice synthesis enable suggestion */}
-            {synthesis.error && (
-              <div className="mb-3 px-3 py-2 bg-[var(--primary-50)] text-[var(--primary-700)] rounded-2xl text-xs flex items-center gap-2">
+            {/* Voice error */}
+            {chat.voiceError && (
+              <div className="mb-3 px-3 py-2 bg-[var(--accent-yellow)]/10 text-[var(--accent-yellow)]
+                rounded-2xl text-xs flex items-center gap-2">
                 <Volume2 size={14} />
-                <span className="flex-1">{synthesis.error}</span>
-                {(synthesis as any).enable ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      try {
-                        (synthesis as any).enable();
-                        const lastMessage = chat.messages[chat.messages.length - 1];
-                        if (
-                          lastMessage &&
-                          lastMessage.role === 'assistant' &&
-                          lastMessage.id !== lastSpokenMessageIdRef.current &&
-                          lastMessage.content
-                        ) {
-                          lastSpokenMessageIdRef.current = lastMessage.id;
-                          synthesis.speak(lastMessage.content);
-                        }
-                      } catch (e) {
-                        // ignore
-                      }
-                    }}
-                    className="ml-2 underline text-[var(--primary-700)]"
-                  >
-                    Habilitar voz
-                  </button>
-                ) : null}
+                <span className="flex-1">{chat.voiceError}</span>
               </div>
             )}
 

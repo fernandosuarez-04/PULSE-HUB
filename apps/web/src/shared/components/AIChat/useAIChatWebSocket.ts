@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useElevenLabsAudio } from './useElevenLabsAudio';
+import { useHybridVoice } from './useHybridVoice';
 
 export interface ChatMessage {
   id: string;
@@ -16,6 +16,7 @@ export interface ChatMessage {
   content: string;
   timestamp: number;
   audio?: string; // Base64-encoded audio from ElevenLabs
+  audioError?: boolean; // Flag to indicate audio generation failed
 }
 
 export interface UseAIChatReturn {
@@ -27,8 +28,10 @@ export interface UseAIChatReturn {
   clearMessages: () => void;
   reconnect: () => void;
   // Audio playback state
-  isPlayingAudio: boolean;
-  audioError: string | null;
+  isSpeaking: boolean;
+  voiceError: string | null;
+  voiceName: string | null;
+  stopVoice: () => void;
 }
 
 // WebSocket message types
@@ -67,8 +70,8 @@ export function useAIChatWebSocket(): UseAIChatReturn {
   const reconnectAttemptsRef = useRef<number>(0);
   const maxReconnectAttempts = 5;
 
-  // ElevenLabs audio hook
-  const elevenLabsAudio = useElevenLabsAudio();
+  // Hybrid voice hook (ElevenLabs + Web Speech API fallback)
+  const hybridVoice = useHybridVoice();
 
   /**
    * Connects to WebSocket server
@@ -119,14 +122,19 @@ export function useAIChatWebSocket(): UseAIChatReturn {
                   content: serverMessage.text,
                   timestamp: Date.now(),
                   audio: serverMessage.audio, // Include audio if available
+                  audioError: serverMessage.audio === undefined, // Flag if no audio
                 };
 
                 setMessages((prev) => [...prev, assistantMessage]);
 
-                // Auto-play audio if available
+                // Auto-play voice (ElevenLabs or Web Speech API fallback)
                 if (serverMessage.audio) {
-                  console.log('🎙️ Playing ElevenLabs audio from message');
-                  elevenLabsAudio.playAudio(serverMessage.audio);
+                  console.log('🎙️ Playing ElevenLabs audio from backend');
+                  hybridVoice.playElevenLabsAudio(serverMessage.audio);
+                } else {
+                  // Fallback to Web Speech API if no audio from backend
+                  console.warn('⚠️ No audio from backend, using Web Speech API fallback');
+                  hybridVoice.speakText(serverMessage.text);
                 }
               }
               break;
@@ -175,7 +183,8 @@ export function useAIChatWebSocket(): UseAIChatReturn {
       console.error('Error connecting to WebSocket:', err);
       setError('No se pudo conectar con el servidor');
     }
-  }, [elevenLabsAudio]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * Disconnect from WebSocket
@@ -217,9 +226,10 @@ export function useAIChatWebSocket(): UseAIChatReturn {
     setMessages((prev) => [...prev, userMessage]);
     setError(null);
 
-    // Stop any currently playing audio when user sends a message
-    if (elevenLabsAudio.isPlaying) {
-      elevenLabsAudio.stopAudio();
+    // BARGE-IN: Stop any currently playing voice when user sends a message
+    if (hybridVoice.isSpeaking) {
+      console.log('⚡ Barge-in: User sent message, stopping voice output');
+      hybridVoice.stopSpeaking();
     }
 
     // Send message via WebSocket
@@ -230,7 +240,7 @@ export function useAIChatWebSocket(): UseAIChatReturn {
     };
 
     wsRef.current.send(JSON.stringify(clientMessage));
-  }, [elevenLabsAudio]);
+  }, [hybridVoice]);
 
   /**
    * Clears all messages
@@ -239,14 +249,14 @@ export function useAIChatWebSocket(): UseAIChatReturn {
     setMessages([]);
     setError(null);
 
-    // Stop any playing audio
-    if (elevenLabsAudio.isPlaying) {
-      elevenLabsAudio.stopAudio();
+    // Stop any playing voice
+    if (hybridVoice.isSpeaking) {
+      hybridVoice.stopSpeaking();
     }
 
     // Generate new session ID when clearing
     sessionIdRef.current = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }, [elevenLabsAudio]);
+  }, [hybridVoice]);
 
   /**
    * Manual reconnect function
@@ -277,8 +287,10 @@ export function useAIChatWebSocket(): UseAIChatReturn {
     sendMessage,
     clearMessages,
     reconnect,
-    // Audio playback state from ElevenLabs hook
-    isPlayingAudio: elevenLabsAudio.isPlaying,
-    audioError: elevenLabsAudio.error,
+    // Voice playback state from hybrid voice hook
+    isSpeaking: hybridVoice.isSpeaking,
+    voiceError: hybridVoice.error,
+    voiceName: hybridVoice.voiceName,
+    stopVoice: hybridVoice.stopSpeaking,
   };
 }
