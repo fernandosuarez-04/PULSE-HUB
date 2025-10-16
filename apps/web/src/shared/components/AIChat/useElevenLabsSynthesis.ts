@@ -51,9 +51,17 @@ function cleanTextForSpeech(text: string): string {
   // Remove list bullets at start of line (-, *)
   cleaned = cleaned.replace(/^[-*]\s+/gm, '');
 
+  // Clean punctuation for more natural flow
+  cleaned = cleaned.replace(/\.{2,}/g, '.'); // Replace multiple dots with single dot
+  cleaned = cleaned.replace(/\?{2,}/g, '?'); // Replace multiple question marks
+  cleaned = cleaned.replace(/!{2,}/g, '!'); // Replace multiple exclamation marks
+
   // Replace multiple line breaks with natural pauses
   cleaned = cleaned.replace(/\n{2,}/g, '. ');
   cleaned = cleaned.replace(/\n/g, ', ');
+
+  // Clean punctuation spacing for natural flow
+  cleaned = cleaned.replace(/\s*([.!?])\s*/g, '$1 ');
 
   // Remove multiple spaces
   cleaned = cleaned.replace(/\s{2,}/g, ' ');
@@ -153,11 +161,11 @@ export function useElevenLabsSynthesis(): UseElevenLabsSynthesisReturn {
             },
             body: JSON.stringify({
               text: cleanedText,
-              model_id: 'eleven_turbo_v2', // Use faster model for better latency
+              model_id: modelId, // Use configured model (eleven_multilingual_v2)
               voice_settings: {
-                stability: 0.4, // Slightly lower for faster generation
-                similarity_boost: 0.7, // Slightly lower for faster generation
-                style: 0.0,
+                stability: 0.3, // Lower stability for more natural, less robotic sound
+                similarity_boost: 0.9, // Higher boost for more natural voice
+                style: 0.4, // Higher style for more expressive, fluid speech
                 use_speaker_boost: true,
               },
             }),
