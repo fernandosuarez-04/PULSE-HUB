@@ -14,7 +14,7 @@ import { X, Send, Loader2, WifiOff, Mic, MicOff, Volume2 } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import { VoiceInterface } from './VoiceInterface';
 import { useVoiceRecognition } from './useVoiceRecognition';
-import { useVoiceSynthesis } from './useVoiceSynthesis';
+import { useElevenLabsSynthesis } from './useElevenLabsSynthesis';
 import type { UseAIChatReturn } from './useAIChat';
 
 // Audio Equalizer Icon Component
@@ -58,16 +58,8 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   // Voice recognition hook (for user input)
   const voice = useVoiceRecognition();
 
-  // Synthesis object for UI compatibility (uses chat.isSpeaking from hybrid voice)
-  const synthesis = {
-    isSupported: true, // Always supported now (ElevenLabs + fallback)
-    isSpeaking: chat.isSpeaking || false,
-    selectedVoice: chat.voiceName ? { name: chat.voiceName } : null,
-    availableVoices: [],
-    speak: () => {}, // Not needed, auto-play handled by useAIChatWebSocket
-    stop: chat.stopVoice, // Map to hybrid voice stop function
-    error: chat.voiceError,
-  };
+  // Voice synthesis hook (for agent responses) - Using ElevenLabs
+  const synthesis = useElevenLabsSynthesis();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -92,28 +84,59 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     }
   }, [isOpen, synthesis]);
 
-  // Handle voice transcript
+  // Handle voice transcript - show interim results
   useEffect(() => {
-    if (voice.transcript && !voice.isListening) {
-      // When voice recognition completes, set transcript to input
+    if (voice.transcript) {
+      // Always update input with current transcript (interim or final)
       setInputValue(voice.transcript);
-      voice.clearTranscript();
+    }
+  }, [voice.transcript]);
+
+  // Handle voice transcript completion - auto-submit when listening stops
+  useEffect(() => {
+    // When voice recognition stops and we have a transcript
+    if (!voice.isListening && voice.transcript && voice.transcript.trim()) {
       // Auto-submit the voice message
-      if (voice.transcript.trim() && !chat.isTyping) {
-        chat.sendMessage(voice.transcript);
+      if (!chat.isTyping) {
+        const messageToSend = voice.transcript;
+        voice.clearTranscript();
         setInputValue('');
+        chat.sendMessage(messageToSend);
       }
     }
-  }, [voice.transcript, voice.isListening, chat, voice]);
+  }, [voice.isListening, voice.transcript, chat.isTyping, chat, voice]);
 
-  // Auto-play voice is handled automatically in useAIChatWebSocket
-  // No manual intervention needed
-
-  // BARGE-IN: Stop voice when user starts speaking (voice recognition)
+  // Auto-speak agent responses (only new messages)
   useEffect(() => {
-    if (voice.isListening && chat.isSpeaking) {
-      console.log('⚡ Barge-in: User started speaking, stopping agent voice');
-      chat.stopVoice();
+    if (chat.messages.length === 0 || !synthesis.isSupported) return;
+
+    const lastMessage = chat.messages[chat.messages.length - 1];
+
+    // Only speak if:
+    // 1. It's an agent message
+    // 2. We haven't spoken this message before
+    // 3. The message has content
+    if (
+      lastMessage.role === 'assistant' &&
+      lastMessage.id !== lastSpokenMessageIdRef.current &&
+      lastMessage.content
+    ) {
+      console.log('🗣️ Speaking new message with ElevenLabs:', lastMessage.id);
+      // Mark this message as spoken
+      lastSpokenMessageIdRef.current = lastMessage.id;
+      // Speak the agent's response (ElevenLabs returns a promise)
+      synthesis.speak(lastMessage.content).catch((err) => {
+        console.error('Error speaking with ElevenLabs:', err);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat.messages]); // Only depend on messages, not synthesis
+
+  // BARGE-IN: Stop agent speech when user starts speaking
+  useEffect(() => {
+    if (voice.isListening && (synthesis.isSpeaking || synthesis.isGenerating)) {
+      console.log('⚡ Barge-in: User started speaking, stopping agent');
+      synthesis.stop();
     }
   }, [voice.isListening, chat]);
 
@@ -173,7 +196,16 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <div>
                 <h3 className="font-semibold text-base">Asistente IA</h3>
                 <p className="text-xs text-white/80">
-                  {synthesis.isSpeaking ? (
+                  {synthesis.isGenerating ? (
+                    <span key="generating" className="inline-flex items-center">
+                      <Loader2
+                        size={12}
+                        className="inline-block mr-1.5 animate-spin"
+                        aria-hidden="true"
+                      />
+                      Preparando voz...
+                    </span>
+                  ) : synthesis.isSpeaking ? (
                     <span key="speaking" className="inline-flex items-center">
                       <Volume2
                         size={12}
@@ -197,7 +229,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                 {/* Voice info */}
                 {chat.voiceName && (
                   <p className="text-[10px] text-white/60 mt-0.5">
-                    🎙️ {chat.voiceName}
+                    🎙️ ElevenLabs AI Voice
                   </p>
                 )}
               </div>
@@ -311,10 +343,19 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
 
             {/* Listening indicator */}
             {voice.isListening && (
-              <div className="mb-3 px-3 py-2 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
-                rounded-2xl text-xs flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[var(--accent-red)] animate-pulse" />
-                <span className="font-medium">Escuchando...</span>
+              <div className="mb-3 px-4 py-3 bg-[var(--accent-red)]/10 text-[var(--accent-red)]
+                rounded-2xl text-sm flex flex-col gap-2 border border-[var(--accent-red)]/20">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1">
+                    <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '0ms' }} />
+                    <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '150ms' }} />
+                    <div className="w-1 h-4 rounded-full bg-[var(--accent-red)] animate-pulse" style={{ animationDelay: '300ms' }} />
+                  </div>
+                  <span className="font-semibold">🎤 Escuchando... Habla ahora</span>
+                </div>
+                <p className="text-xs text-[var(--neutral-600)]">
+                  💡 Habla claramente cerca del micrófono. Abre la consola del navegador para ver logs de diagnóstico.
+                </p>
               </div>
             )}
 
@@ -323,7 +364,34 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <div className="mb-3 px-3 py-2 bg-[var(--accent-yellow)]/10 text-[var(--accent-yellow)]
                 rounded-2xl text-xs flex items-center gap-2">
                 <Volume2 size={14} />
-                <span className="flex-1">{chat.voiceError}</span>
+                <span className="flex-1">{synthesis.error}</span>
+                {synthesis.enable ? (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        if (synthesis.enable) {
+                          await synthesis.enable();
+                        }
+                        const lastMessage = chat.messages[chat.messages.length - 1];
+                        if (
+                          lastMessage &&
+                          lastMessage.role === 'assistant' &&
+                          lastMessage.id !== lastSpokenMessageIdRef.current &&
+                          lastMessage.content
+                        ) {
+                          lastSpokenMessageIdRef.current = lastMessage.id;
+                          await synthesis.speak(lastMessage.content);
+                        }
+                      } catch (e) {
+                        // ignore
+                      }
+                    }}
+                    className="ml-2 underline text-[var(--primary-700)]"
+                  >
+                    Habilitar voz
+                  </button>
+                ) : null}
               </div>
             )}
 
@@ -354,6 +422,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                   type="button"
                   onClick={handleVoiceToggle}
                   disabled={!chat.isConnected || chat.isTyping}
+                  title="Modo de voz"
                   className={`px-3 py-2.5 rounded-2xl
                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                     flex items-center justify-center min-w-[40px]
@@ -374,6 +443,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <button
                 type="submit"
                 disabled={!chat.isConnected || chat.isTyping || !inputValue.trim() || voice.isListening}
+                title="Enviar pregunta"
                 className="px-3 py-2.5 bg-[var(--primary-600)] text-white
                   rounded-2xl hover:bg-[var(--primary-600)]/90
                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed
@@ -396,11 +466,11 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               md:text-xs
               sm:text-xs
               max-sm:text-[10px] max-sm:leading-tight">
-              <span className="hidden sm:inline">Presiona Enter para enviar • Shift+Enter para nueva línea</span>
-              <span className="sm:hidden">Enter para enviar • Shift+Enter nueva línea</span>
+              <span className="hidden sm:inline">Presiona Enter para enviar tu mensaje</span>
+              <span className="sm:hidden">Enter para enviar</span>
               {voice.isSupported && (
                 <>
-                  <span className="hidden sm:inline"> • Click en micrófono para voz</span>
+                  <span className="hidden sm:inline"> • Click en micrófono para modo de voz</span>
                   <span className="sm:hidden"> • Micrófono para voz</span>
                 </>
               )}

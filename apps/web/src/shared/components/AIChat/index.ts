@@ -11,3 +11,5 @@ export type {
   VoiceSynthesisConfig,
   UseVoiceSynthesisReturn,
 } from './useVoiceSynthesis';
+export { useElevenLabsSynthesis } from './useElevenLabsSynthesis';
+export type { UseElevenLabsSynthesisReturn } from './useElevenLabsSynthesis';
