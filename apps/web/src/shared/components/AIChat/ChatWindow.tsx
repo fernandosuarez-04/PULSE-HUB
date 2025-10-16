@@ -14,7 +14,7 @@ import { X, Send, Loader2, WifiOff, Mic, MicOff, Volume2 } from 'lucide-react';
 import { ChatMessage } from './ChatMessage';
 import { VoiceInterface } from './VoiceInterface';
 import { useVoiceRecognition } from './useVoiceRecognition';
-import { useVoiceSynthesis } from './useVoiceSynthesis';
+import { useElevenLabsSynthesis } from './useElevenLabsSynthesis';
 import type { UseAIChatReturn } from './useAIChat';
 
 // Audio Equalizer Icon Component
@@ -58,8 +58,8 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   // Voice recognition hook (for user input)
   const voice = useVoiceRecognition();
 
-  // Voice synthesis hook (for agent responses)
-  const synthesis = useVoiceSynthesis();
+  // Voice synthesis hook (for agent responses) - Using ElevenLabs
+  const synthesis = useElevenLabsSynthesis();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -113,18 +113,20 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
       lastMessage.id !== lastSpokenMessageIdRef.current &&
       lastMessage.content
     ) {
-      console.log('🗣️ Speaking new message:', lastMessage.id);
+      console.log('🗣️ Speaking new message with ElevenLabs:', lastMessage.id);
       // Mark this message as spoken
       lastSpokenMessageIdRef.current = lastMessage.id;
-      // Speak the agent's response
-      synthesis.speak(lastMessage.content);
+      // Speak the agent's response (ElevenLabs returns a promise)
+      synthesis.speak(lastMessage.content).catch((err) => {
+        console.error('Error speaking with ElevenLabs:', err);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat.messages]); // Only depend on messages, not synthesis
 
   // BARGE-IN: Stop agent speech when user starts speaking
   useEffect(() => {
-    if (voice.isListening && synthesis.isSpeaking) {
+    if (voice.isListening && (synthesis.isSpeaking || synthesis.isGenerating)) {
       console.log('⚡ Barge-in: User started speaking, stopping agent');
       synthesis.stop();
     }
@@ -186,7 +188,16 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <div>
                 <h3 className="font-semibold text-base">Asistente IA</h3>
                 <p className="text-xs text-white/80">
-                  {synthesis.isSpeaking ? (
+                  {synthesis.isGenerating ? (
+                    <span key="generating" className="inline-flex items-center">
+                      <Loader2
+                        size={12}
+                        className="inline-block mr-1.5 animate-spin"
+                        aria-hidden="true"
+                      />
+                      Preparando voz...
+                    </span>
+                  ) : synthesis.isSpeaking ? (
                     <span key="speaking" className="inline-flex items-center">
                       <Volume2
                         size={12}
@@ -210,7 +221,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                 {/* Voice info */}
                 {synthesis.isSupported && synthesis.selectedVoice && (
                   <p className="text-[10px] text-white/60 mt-0.5">
-                    🎙️ {synthesis.selectedVoice.name}
+                    🎙️ ElevenLabs AI Voice
                   </p>
                 )}
               </div>
@@ -336,12 +347,14 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <div className="mb-3 px-3 py-2 bg-[var(--primary-50)] text-[var(--primary-700)] rounded-2xl text-xs flex items-center gap-2">
                 <Volume2 size={14} />
                 <span className="flex-1">{synthesis.error}</span>
-                {(synthesis as any).enable ? (
+                {synthesis.enable ? (
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       try {
-                        (synthesis as any).enable();
+                        if (synthesis.enable) {
+                          await synthesis.enable();
+                        }
                         const lastMessage = chat.messages[chat.messages.length - 1];
                         if (
                           lastMessage &&
@@ -350,7 +363,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                           lastMessage.content
                         ) {
                           lastSpokenMessageIdRef.current = lastMessage.id;
-                          synthesis.speak(lastMessage.content);
+                          await synthesis.speak(lastMessage.content);
                         }
                       } catch (e) {
                         // ignore
