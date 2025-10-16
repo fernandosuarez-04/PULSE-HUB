@@ -91,6 +91,19 @@ cd apps/api && npm run dev
 - Backend: http://localhost:4000
 - Backend Health Check: http://localhost:4000/health
 
+**Port Issues (Windows)**:
+If ports are already in use:
+```bash
+# Kill specific port processes
+.\kill-ports.bat
+# or
+.\kill-ports.ps1
+
+# Or manually with netstat
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+```
+
 ### Building and Testing
 
 ```bash
@@ -115,18 +128,40 @@ npm run clean
 
 ### Working with the Voice AI Agent
 
-The `agente-ia-conversacional-main/` directory is a separate Node.js/TypeScript project:
+The `agente-ia-conversacional-main/` directory is a separate Node.js/TypeScript project (standalone voice agent):
 
 ```bash
 cd agente-ia-conversacional-main
 
 npm install
-npm start          # Start voice agent server
+npm start          # Start voice agent server on port 3000
 npm run evals      # Run evaluations
 npm run tracing:demo
 ```
 
-See `agente-ia-conversacional-main/CLAUDE.md` for detailed guidance.
+**Note**: The standalone agent is separate from the web app's integrated AI chat. The web app (`apps/web`) has its own AI chat feature using WebSocket connections to the backend API.
+
+See `agente-ia-conversacional-main/CLAUDE.md` for detailed guidance on the standalone agent.
+
+### Working with Git LFS
+
+Large files (like `Video.mp4`) are tracked with Git LFS:
+
+```bash
+# Install Git LFS (if not already)
+git lfs install
+
+# Track large files (already configured in .gitattributes)
+git lfs track "*.mp4"
+
+# Check LFS status
+git lfs status
+
+# Pull LFS files
+git lfs pull
+```
+
+**Important**: When cloning the repository, ensure Git LFS is installed first to properly download large files.
 
 ## 🎨 Design System
 
@@ -237,32 +272,82 @@ ComponentName/
 
 ### Architecture
 
-The AI chat feature uses a WebSocket-based architecture:
+The AI chat feature uses a WebSocket-based architecture connecting the Next.js frontend to the Express backend:
 
 **Backend** (`apps/api/src/features/ai-chat/`):
-- `ai-chat.service.ts` - Main service managing conversations
-- `services/openai-service.ts` - OpenAI API integration with function calling
+- `ai-chat.service.ts` - Main service managing conversations and voice synthesis
+- `services/openai-service.ts` - OpenAI API integration with function calling (GPT-4o-mini)
+- `services/elevenlabs-service.ts` - **ElevenLabs TTS integration** for high-quality voice output
 - `tools/coda.ts` - Coda API integration for saving inquiries
-- WebSocket server in `server.ts` for real-time communication
+- WebSocket server in `server.ts` for real-time communication on port 4000
 
 **Frontend** (`apps/web/src/shared/components/AIChat/`):
-- `AIChat.tsx` - Main container component
-- `ChatBubble.tsx` - Floating action button
+- `AIChat.tsx` - Main container component with state management
+- `ChatBubble.tsx` - Floating action button (bottom-right)
 - `ChatWindow.tsx` - Chat interface with voice controls
-- `useAIChat.ts` - WebSocket hook for real-time messaging
-- `useVoiceRecognition.ts` - Browser Speech Recognition API
+- `ChatMessage.tsx` - Individual message rendering
+- `useAIChatWebSocket.ts` - WebSocket hook with ElevenLabs audio support
+- `useElevenLabsAudio.ts` - Audio playback from base64-encoded ElevenLabs audio
+- `useVoiceRecognition.ts` - Browser Web Speech API for voice input (Spanish)
+- ~~`useVoiceSynthesis.ts`~~ - *Deprecated: Replaced by ElevenLabs for superior quality*
 
 ### Key Features
 
-- **Voice Input**: Browser-based speech recognition with auto-submit
-- **Real-time Messaging**: WebSocket connection for instant responses
-- **Function Calling**: OpenAI automatically calls tools (e.g., save to Coda)
-- **Session Management**: Each chat session has a unique ID
-- **Conversation History**: Maintains context across messages
+- **Voice Input**: Browser-based speech recognition with auto-submit (Web Speech API)
+- **Voice Output**: High-quality text-to-speech using **ElevenLabs** AI voices
+  - Natural Spanish voice synthesis
+  - Automatic audio playback with agent responses
+  - Base64-encoded audio transmitted via WebSocket
+  - Fallback to text-only if ElevenLabs not configured
+- **Real-time Messaging**: WebSocket connection for instant bidirectional communication
+- **Function Calling**: OpenAI automatically calls tools (e.g., save to Coda, search knowledge base)
+- **Session Management**: Each chat session has a unique ID (UUID)
+- **Conversation History**: Maintains context across messages (last 10 messages)
+- **Persistent UI**: Floating bubble accessible from all pages
+
+### WebSocket Message Flow
+
+```typescript
+// Client → Server (user message)
+ws.send(JSON.stringify({
+  type: 'user_message',
+  text: userMessage,
+  sessionId: sessionId
+}));
+
+// Server → Client (agent response)
+{
+  type: 'message',
+  text: agentResponse,
+  sessionId: sessionId
+}
+```
+
+### Voice Recognition Setup
+
+The voice interface uses the browser's native Web Speech API:
+- Language: Spanish (`es-ES`)
+- Auto-submit on speech end
+- Visual feedback during recording
+- Interrupt capability (stop agent speech)
+
+**Browser Support**: Chrome, Edge, Safari (WebKit-based browsers)
 
 ### Usage
 
-The AIChat component is placed in the root layout (`apps/web/src/app/layout.tsx`) and appears on all pages.
+The AIChat component is placed in the root layout (`apps/web/src/app/layout.tsx`) and appears on all pages as a floating bubble in the bottom-right corner.
+
+### Deployment Considerations
+
+**Development**:
+- Frontend: `http://localhost:3000`
+- Backend WebSocket: `ws://localhost:4000`
+
+**Production**:
+- Update WebSocket URL in `useAIChat.ts` to production backend
+- Ensure CORS settings allow frontend domain
+- Use secure WebSocket (`wss://`) in production
+- Voice API requires HTTPS (except localhost)
 
 ## 📋 Environment Variables
 
@@ -271,6 +356,9 @@ The AIChat component is placed in the root layout (`apps/web/src/app/layout.tsx`
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
 NEXT_PUBLIC_APP_NAME=PULSE HUB
 ```
+
+**Netlify Functions** (if deploying to Netlify):
+Environment variables are configured in Netlify dashboard. The web app includes serverless functions in `apps/web/netlify/functions/` for API routes.
 
 ### Backend (`apps/api/.env`)
 ```env
@@ -288,15 +376,29 @@ EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
 EMAIL_FROM=noreply@pulsehub.com
 
-# OpenAI Configuration
+# OpenAI Configuration (REQUIRED for AI Chat)
 OPENAI_API_KEY=your-openai-api-key
 OPENAI_MODEL=gpt-4o-mini
+OPENAI_MAX_TOKENS=1000
 
-# Coda Configuration
+# Coda Configuration (REQUIRED for AI Chat)
 CODA_API_KEY=your-coda-api-key
 CODA_DOC_ID=your-doc-id
 CODA_TABLE_ID=grid-xxxx
+
+# ElevenLabs Configuration (REQUIRED for Voice Output)
+ELEVENLABS_API_KEY=your-elevenlabs-api-key
+ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM  # Optional: Rachel voice (default)
+ELEVENLABS_MODEL_ID=eleven_multilingual_v2  # Optional: Multilingual model for Spanish
 ```
+
+**Getting API Keys**:
+- OpenAI: https://platform.openai.com/api-keys
+- Coda: https://coda.io/account (Account Settings → API Settings)
+- **ElevenLabs**: https://elevenlabs.io/app/settings/api-keys
+  - Free tier: 10,000 characters/month
+  - Voice IDs: https://elevenlabs.io/app/voice-lab
+  - Recommended voices for Spanish: Rachel, Bella, or any multilingual voice
 
 ## 🎯 Code Quality Standards
 
@@ -395,6 +497,55 @@ npm run build
 - Verify backend is running on port 4000
 - Check WebSocket server is initialized in `apps/api/src/server.ts`
 - Ensure OPENAI_API_KEY is set in backend `.env`
+- Check browser console for connection errors
+- Frontend connects to `ws://localhost:4000` (not `/api` path)
+- In production, use `wss://` protocol with valid SSL certificate
+
+**Voice recognition not working**:
+- Only works in Chrome, Edge, Safari (WebKit-based browsers)
+- Requires microphone permissions from browser
+- Voice API requires HTTPS in production (HTTP ok for localhost)
+- Check browser console for permission errors
+- Language is set to Spanish (`es-ES`)
+
+**ElevenLabs audio not playing**:
+- Verify `ELEVENLABS_API_KEY` is set in backend `.env`
+- Check backend console for "✅ ElevenLabs Service initialized"
+- If not configured, system falls back to text-only (no error)
+- Free tier limit: 10,000 characters/month
+- Check browser console for audio playback errors
+- Autoplay may be blocked - user must interact with page first
+
+**ElevenLabs API errors**:
+```bash
+# Check backend logs for:
+✅ ElevenLabs Service initialized
+🎙️ ElevenLabs: Generating speech...
+✅ ElevenLabs: Audio generated (XXX bytes)
+
+# Common errors:
+# - Invalid API key: Check key at https://elevenlabs.io/app/settings/api-keys
+# - Quota exceeded: Check usage at https://elevenlabs.io/app/usage
+# - Voice ID not found: Verify voice ID exists in your account
+```
+
+**Git LFS files not downloading**:
+```bash
+# Install Git LFS first
+git lfs install
+
+# Pull LFS files
+git lfs pull
+
+# Verify LFS tracking
+git lfs ls-files
+```
+
+**Video not playing in Home page**:
+- Ensure `Video.mp4` is downloaded via Git LFS
+- Check file exists at `apps/web/public/Video.mp4`
+- File size should be ~22MB (if much smaller, LFS didn't pull it)
+- Run `git lfs pull` to download the actual file
 
 ## 📚 Documentation
 
@@ -418,7 +569,107 @@ docs/
 
 fernando.suarez@ecosdeliderazgo.com
 
+## 🚢 Deployment
+
+### Frontend Deployment (Next.js)
+
+The frontend can be deployed to Vercel (recommended) or Netlify:
+
+**Vercel** (recommended):
+- Automatic deployments from Git
+- Zero-config for Next.js 15
+- Edge network for optimal performance
+- Built-in Analytics and Web Vitals monitoring
+
+**Netlify**:
+- Configured via `netlify.toml` in project root
+- Serverless functions in `apps/web/netlify/functions/`
+- Environment variables set in Netlify dashboard
+
+### Backend Deployment (Express)
+
+**Recommended providers**:
+- Railway - PostgreSQL + Node.js hosting
+- Render - Automatic deployments from Git
+- Fly.io - Edge deployment with WebSocket support
+
+**Requirements**:
+- Node.js 20 LTS
+- WebSocket support (ensure provider supports WS connections)
+- Environment variables configured for OpenAI, Coda, email
+
+### Database
+
+Currently the project doesn't use a database for the main app. If needed in future:
+- Prisma ORM configured for PostgreSQL
+- Railway or Neon for serverless PostgreSQL
+
+### CI/CD
+
+The project uses GitHub Actions for the standalone agent evaluations. For the main monorepo:
+- Set up deployment workflows per your hosting provider
+- Configure secrets for API keys (OPENAI_API_KEY, CODA_API_KEY, etc.)
+- Run build and lint checks on pull requests
+
+## 🎙️ ElevenLabs Voice Integration
+
+### Overview
+
+The AI Chat uses **ElevenLabs** for high-quality text-to-speech instead of browser's native SpeechSynthesis API. This provides:
+- Natural, human-like Spanish voices
+- Consistent quality across all browsers and devices
+- Professional voice synthesis for enterprise use
+- No reliance on browser TTS support
+
+### Architecture Flow
+
+```
+1. User sends message → Backend (WebSocket)
+2. OpenAI generates text response
+3. ElevenLabs converts text → MP3 audio
+4. Audio encoded to Base64
+5. Sent to frontend via WebSocket
+6. Frontend decodes Base64 → Blob
+7. Audio plays automatically
+```
+
+### Configuration
+
+**Voice Selection**:
+- Default: Rachel (`21m00Tcm4TlvDq8ikWAM`) - Natural, clear voice
+- Spanish-optimized: Use multilingual voices from voice lab
+- Change via `ELEVENLABS_VOICE_ID` environment variable
+
+**Voice Settings** (in `elevenlabs-service.ts`):
+- `stability`: 0.5 (balanced)
+- `similarityBoost`: 0.75 (natural voice)
+- `style`: 0.4 (moderate expressiveness)
+- `useSpeakerBoost`: true (enhanced clarity)
+
+### Customization
+
+To change voices, visit https://elevenlabs.io/app/voice-lab and:
+1. Find a voice you like
+2. Copy its Voice ID
+3. Set `ELEVENLABS_VOICE_ID` in backend `.env`
+4. Restart backend server
+
+**Popular Spanish voices**:
+- Bella (female, warm)
+- Antoni (male, professional)
+- Rachel (female, clear - default)
+
+### Cost Management
+
+**Free Tier**: 10,000 characters/month
+- ~200-250 agent responses
+- Upgrade to paid tier for unlimited usage
+
+**Monitoring usage**:
+- Check: https://elevenlabs.io/app/usage
+- Backend logs show: `✅ Audio generated (XXX bytes)`
+
 ---
 
 **Last Updated**: January 2025
-**Version**: 1.2 - Enhanced with AI Chat architecture and critical gotchas
+**Version**: 1.4 - Added ElevenLabs TTS integration, WebSocket audio streaming, and voice configuration

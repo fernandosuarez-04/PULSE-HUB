@@ -111,16 +111,18 @@ wss.on('connection', (ws: WebSocket) => {
           throw new Error('Chat service not found for connection');
         }
 
-        const response = await chatService.handleMessage(clientMessage.text);
+        // Get response with audio
+        const chatResponse = await chatService.handleMessageWithAudio(clientMessage.text);
 
-        // Send agent response
+        // Send agent response with audio
         const agentMessage: ServerMessage = {
           type: 'agent_message',
-          text: response,
+          text: chatResponse.text,
+          audio: chatResponse.audio, // Base64-encoded audio from ElevenLabs
         };
         ws.send(JSON.stringify(agentMessage));
 
-        // console.log(`📤 Sent response: "${response.substring(0, 50)}..."`);
+        // console.log(`📤 Sent response: "${chatResponse.text.substring(0, 50)}..." ${chatResponse.audio ? '🎙️ with audio' : ''}`);
       }
     } catch (error) {
       // console.error('❌ Error processing message:', error);

@@ -2,30 +2,58 @@
  * AI Chat Service
  *
  * Main service for managing AI chat conversations.
- * Handles greetings, message processing, and conversation history.
+ * Handles greetings, message processing, conversation history, and voice synthesis.
  */
 
 import { createOpenAIService } from './services/openai-service';
 import type { OpenAIService } from './services/openai-service';
+import { getElevenLabsService } from './services/elevenlabs-service';
+import type { ElevenLabsService } from './services/elevenlabs-service';
+
+export interface ChatResponse {
+  text: string;
+  audio?: string; // Base64-encoded audio
+}
 
 export class AIChatService {
   private greeted = false;
   private openaiService: OpenAIService;
+  private elevenLabsService: ElevenLabsService | null = null;
   private sessionId: string;
 
   constructor() {
     // Initialize OpenAI Service
     this.openaiService = createOpenAIService();
     this.sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Initialize ElevenLabs Service (optional - falls back to text-only if not configured)
+    try {
+      this.elevenLabsService = getElevenLabsService();
+      // console.log(`🎙️ ElevenLabs enabled for session ${this.sessionId}`);
+    } catch (error) {
+      console.warn('⚠️ ElevenLabs not configured, audio generation disabled');
+      this.elevenLabsService = null;
+    }
+
     // console.log(`🤖 AI Chat Service initialized | Session: ${this.sessionId}`);
   }
 
   /**
    * Handles incoming user message and generates response
    * @param input User's message
-   * @returns Assistant's response
+   * @returns Assistant's response (text only, for backward compatibility)
    */
   async handleMessage(input: string): Promise<string> {
+    const response = await this.handleMessageWithAudio(input);
+    return response.text;
+  }
+
+  /**
+   * Handles incoming user message and generates response with audio
+   * @param input User's message
+   * @returns Assistant's response with text and optional audio
+   */
+  async handleMessageWithAudio(input: string): Promise<ChatResponse> {
     const startTime = Date.now();
     const message = input.toLowerCase().trim();
 
@@ -33,28 +61,41 @@ export class AIChatService {
       // Handle initial greeting (first interaction)
       if (!this.greeted && this.isGreeting(message)) {
         this.greeted = true;
-        const response = this.getGreetingResponse();
+        const responseText = this.getGreetingResponse();
         const latency = Date.now() - startTime;
         // console.log(`✅ Greeting response sent (${latency}ms)`);
-        return response;
+
+        // Generate audio for greeting if ElevenLabs is available
+        const audio = await this.generateAudio(responseText);
+
+        return {
+          text: responseText,
+          audio,
+        };
       }
 
       // Process message with OpenAI (with automatic function calling)
       const toolStartTime = Date.now();
-      const response = await this.openaiService.processMessage(
+      const responseText = await this.openaiService.processMessage(
         input,
         this.sessionId
       );
       const toolDuration = Date.now() - toolStartTime;
 
       // console.log(
-      //   `✅ OpenAI response generated (${toolDuration}ms) | Length: ${response.length} chars`
+      //   `✅ OpenAI response generated (${toolDuration}ms) | Length: ${responseText.length} chars`
       // );
+
+      // Generate audio for response if ElevenLabs is available
+      const audio = await this.generateAudio(responseText);
 
       const latency = Date.now() - startTime;
       // console.log(`⏱️ Total latency: ${latency}ms`);
 
-      return response;
+      return {
+        text: responseText,
+        audio,
+      };
     } catch (error) {
       // console.error('❌ Error in AIChatService:', error);
 
@@ -63,7 +104,36 @@ export class AIChatService {
         'Disculpa, tuve un problema al procesar tu pregunta. ¿Podrías reformularla o preguntar algo diferente?';
       const latency = Date.now() - startTime;
       // console.log(`⚠️ Error response sent (${latency}ms)`);
-      return errorResponse;
+
+      const audio = await this.generateAudio(errorResponse);
+
+      return {
+        text: errorResponse,
+        audio,
+      };
+    }
+  }
+
+  /**
+   * Generates audio from text using ElevenLabs
+   * @param text - Text to convert to speech
+   * @returns Base64-encoded audio or undefined if not available
+   */
+  private async generateAudio(text: string): Promise<string | undefined> {
+    if (!this.elevenLabsService) {
+      return undefined;
+    }
+
+    try {
+      const audioStartTime = Date.now();
+      const audioBase64 = await this.elevenLabsService.textToSpeechBase64(text);
+      const audioDuration = Date.now() - audioStartTime;
+      // console.log(`🎙️ Audio generated (${audioDuration}ms)`);
+      return audioBase64;
+    } catch (error) {
+      console.error('❌ Error generating audio:', error);
+      // Return undefined to fall back to text-only mode
+      return undefined;
     }
   }
 

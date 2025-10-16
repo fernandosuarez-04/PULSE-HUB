@@ -11,6 +11,7 @@
     "clean": "npx rimraf dist"
   },
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.19.0",
     "@pulse-hub/shared": "*",
     "@types/nodemailer": "^7.0.2",
     "cors": "^2.8.5",

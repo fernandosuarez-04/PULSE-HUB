@@ -25,6 +25,7 @@ export interface ClientMessage {
 export interface ServerMessage {
   type: WebSocketMessageType;
   text?: string;
+  audio?: string; // Base64-encoded audio from ElevenLabs
   error?: string;
   sessionId?: string;
 }

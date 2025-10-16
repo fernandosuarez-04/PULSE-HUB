@@ -58,8 +58,19 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   // Voice recognition hook (for user input)
   const voice = useVoiceRecognition();
 
-  // Voice synthesis hook (for agent responses)
-  const synthesis = useVoiceSynthesis();
+  // Voice synthesis hook (for agent responses) - DISABLED in favor of ElevenLabs
+  // const synthesis = useVoiceSynthesis();
+
+  // Dummy synthesis object for compatibility (ElevenLabs handles audio now)
+  const synthesis = {
+    isSupported: false,
+    isSpeaking: chat.isPlayingAudio || false,
+    selectedVoice: null,
+    availableVoices: [],
+    speak: () => {},
+    stop: () => {},
+    error: null,
+  };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -98,37 +109,11 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     }
   }, [voice.transcript, voice.isListening, chat, voice]);
 
-  // Auto-speak agent responses (only new messages)
-  useEffect(() => {
-    if (chat.messages.length === 0 || !synthesis.isSupported) return;
+  // Auto-speak agent responses (ElevenLabs audio is auto-played in useAIChatWebSocket)
+  // No need for manual synthesis here - ElevenLabs audio plays automatically
 
-    const lastMessage = chat.messages[chat.messages.length - 1];
-
-    // Only speak if:
-    // 1. It's an agent message
-    // 2. We haven't spoken this message before
-    // 3. The message has content
-    if (
-      lastMessage.role === 'assistant' &&
-      lastMessage.id !== lastSpokenMessageIdRef.current &&
-      lastMessage.content
-    ) {
-      console.log('🗣️ Speaking new message:', lastMessage.id);
-      // Mark this message as spoken
-      lastSpokenMessageIdRef.current = lastMessage.id;
-      // Speak the agent's response
-      synthesis.speak(lastMessage.content);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chat.messages]); // Only depend on messages, not synthesis
-
-  // BARGE-IN: Stop agent speech when user starts speaking
-  useEffect(() => {
-    if (voice.isListening && synthesis.isSpeaking) {
-      console.log('⚡ Barge-in: User started speaking, stopping agent');
-      synthesis.stop();
-    }
-  }, [voice.isListening, synthesis]);
+  // BARGE-IN: This is handled by sendMessage in useAIChatWebSocket
+  // (stops audio when user sends a message)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
