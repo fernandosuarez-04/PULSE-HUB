@@ -241,7 +241,7 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                  <a href="/capacitacion" className="text-[var(--primary-600)] font-medium hover:underline inline-flex items-center gap-1">
+                  <a href="/capacitacion-ia" className="text-[var(--primary-600)] font-medium hover:underline inline-flex items-center gap-1">
                     Explorar este pilar →
                   </a>
                 </Card>
@@ -271,7 +271,7 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                  <a href="/adopcion" className="text-[var(--accent-orange)] font-medium hover:underline inline-flex items-center gap-1">
+                  <a href="/adopcion-diaria" className="text-[var(--accent-orange)] font-medium hover:underline inline-flex items-center gap-1">
                     Explorar este pilar →
                   </a>
                 </Card>
