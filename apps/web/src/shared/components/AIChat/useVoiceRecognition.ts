@@ -50,22 +50,18 @@ const isMobileDevice = () => {
 /**
  * Audio constraints for high-quality voice recognition.
  * These settings help reduce echo, background noise, and normalize volume levels.
- * For mobile, we use optimized settings to improve detection.
+ *
+ * IMPORTANT NOTE (Mobile):
+ * - On desktop: We request getUserMedia with quality filters for diagnostics
+ * - On mobile: We skip getUserMedia to avoid conflicts with SpeechRecognition
+ * - SpeechRecognition manages microphone access natively on mobile devices
  */
 const getAudioConstraints = (): MediaStreamConstraints => {
-  const isMobile = isMobileDevice();
-
   return {
     audio: {
       echoCancellation: true, // Reduces echo from speakers
-      noiseSuppression: true, // ✅ FIXED: Now enabled for mobile too
+      noiseSuppression: true, // Filters background noise
       autoGainControl: true, // Normalizes microphone volume
-      // Mobile-specific: Request high sample rate for better quality
-      ...(isMobile && {
-        sampleRate: { ideal: 48000 },
-        channelCount: 1,
-        latency: { ideal: 0 }, // Low latency for real-time
-      }),
     },
   };
 };
@@ -91,9 +87,9 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
         const recognition = new SpeechRecognition();
         const isMobile = isMobileDevice();
 
-        // Configuration optimized for mobile devices
+        // Platform-specific configuration
         recognition.lang = 'es-ES'; // Spanish language
-        recognition.continuous = true; // ✅ FIXED: Always continuous for better mobile experience
+        recognition.continuous = !isMobile; // Desktop: continuous, Mobile: single-shot for stability
         recognition.interimResults = true; // Show interim results for immediate feedback
         recognition.maxAlternatives = 1; // One alternative to reduce processing
 
@@ -103,7 +99,8 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
             continuous: recognition.continuous,
             interimResults: recognition.interimResults,
             lang: recognition.lang,
-            device: isMobile ? 'Mobile' : 'Desktop'
+            device: isMobile ? 'Mobile' : 'Desktop',
+            note: isMobile ? 'Single-shot mode for better stability' : 'Continuous mode enabled'
           }
         );
 
@@ -114,6 +111,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
           setError(null);
         };
 
+        // Optional diagnostic events (not reliable on mobile browsers)
         recognition.onaudiostart = () => {
           console.log('🔊 Audio capture started - System is receiving audio');
         };
@@ -139,6 +137,8 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
         };
 
         recognition.onresult = (event: any) => {
+          const isMobile = isMobileDevice();
+
           // Clear any existing silence timer
           if (silenceTimerRef.current) {
             clearTimeout(silenceTimerRef.current);
@@ -158,18 +158,24 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
           // Update transcript (both interim and final)
           setTranscript(transcriptText);
 
-          // If final result, set a silence timer to auto-stop after 1.5 seconds
+          // Platform-specific behavior for final results
           if (isFinal && transcriptText.trim()) {
-            silenceTimerRef.current = setTimeout(() => {
-              console.log('🔇 Silence detected, stopping recognition');
-              if (recognitionRef.current) {
-                try {
-                  recognitionRef.current.stop();
-                } catch (e) {
-                  console.error('Error stopping recognition:', e);
+            if (isMobile) {
+              // Mobile: Single-shot mode, stops automatically after final result
+              console.log('📱 Mobile: Final result received, recognition will stop automatically');
+            } else {
+              // Desktop: Continuous mode, set silence timer to auto-stop
+              silenceTimerRef.current = setTimeout(() => {
+                console.log('🔇 Silence detected, stopping recognition');
+                if (recognitionRef.current) {
+                  try {
+                    recognitionRef.current.stop();
+                  } catch (e) {
+                    console.error('Error stopping recognition:', e);
+                  }
                 }
-              }
-            }, 1500); // Stop after 1.5s of silence
+              }, 1500); // Stop after 1.5s of silence
+            }
           }
         };
 
@@ -249,25 +255,30 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
   }, []);
 
   /**
-   * Requests microphone permissions with audio quality filters.
-   * This helps improve audio quality for voice recognition by setting
-   * echo cancellation, noise suppression, and auto gain control.
+   * Checks microphone permissions before starting recognition.
    *
-   * Note: While Web Speech API doesn't directly use this MediaStream,
-   * requesting permissions with quality constraints influences the browser's
-   * audio pipeline and may improve recognition accuracy.
+   * Platform-specific behavior:
+   * - Desktop: Requests getUserMedia with quality filters for diagnostics
+   * - Mobile: Skips getUserMedia to avoid conflicts, lets SpeechRecognition handle permissions
+   *
+   * IMPORTANT: SpeechRecognition doesn't use MediaStream directly.
+   * On mobile, requesting getUserMedia can cause conflicts and permission issues.
    */
   const requestMicrophonePermissions = useCallback(async () => {
+    const isMobile = isMobileDevice();
+
     try {
+      if (isMobile) {
+        // Mobile: Skip getUserMedia, let SpeechRecognition handle permissions natively
+        console.log('📱 Mobile mode: Skipping getUserMedia, SpeechRecognition will handle permissions');
+        console.log('💡 TIP: Accept microphone permission when prompted by the browser');
+        return true;
+      }
+
+      // Desktop: Request getUserMedia for diagnostics
       const constraints = getAudioConstraints();
-      const isMobile = isMobileDevice();
+      console.log('🎤 Requesting microphone (DESKTOP mode)...', constraints.audio);
 
-      console.log(
-        `🎤 Requesting microphone (${isMobile ? 'MOBILE' : 'DESKTOP'} mode)...`,
-        constraints.audio
-      );
-
-      // Request microphone with quality filters
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
       // Store stream for potential cleanup
@@ -276,37 +287,17 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
       }
       audioStreamRef.current = stream;
 
-      // Test audio levels and log detailed info
+      // Log diagnostic info
       console.log('✅ Microphone permissions granted');
-      console.log('🎙️ Audio tracks:', stream.getAudioTracks().length);
-
       const audioTrack = stream.getAudioTracks()[0];
       if (audioTrack) {
         const settings = audioTrack.getSettings();
         console.log('🔊 Audio track settings:', settings);
-
-        // Mobile-specific diagnostics
-        if (isMobile) {
-          console.log('📱 Mobile audio configuration:');
-          console.log('  - Sample rate:', settings.sampleRate || 'default');
-          console.log('  - Echo cancellation:', settings.echoCancellation);
-          console.log('  - Noise suppression:', settings.noiseSuppression);
-          console.log('  - Auto gain control:', settings.autoGainControl);
-        }
-
-        // Check capabilities (may not be available on all browsers)
-        try {
-          const capabilities = audioTrack.getCapabilities();
-          console.log('📊 Audio track capabilities:', capabilities);
-        } catch (e) {
-          console.log('ℹ️ Capabilities API not supported on this browser');
-        }
       }
 
       return true;
     } catch (err) {
       console.error('❌ Error requesting microphone permissions:', err);
-      const isMobile = isMobileDevice();
 
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
@@ -332,7 +323,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
         if (isMobile) {
           console.log('🔧 Troubleshooting móvil:');
           console.log('  1. Verifica permisos del navegador en configuración del sistema');
-          console.log('  2. Asegúrate de usar HTTPS (requerido para getUserMedia)');
+          console.log('  2. Asegúrate de usar HTTPS (requerido en móviles)');
           console.log('  3. Cierra otras apps que puedan estar usando el micrófono');
           console.log('  4. Intenta recargar la página');
         }
@@ -343,9 +334,10 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
   }, []);
 
   /**
-   * Starts voice recognition with audio quality optimization.
-   * First requests microphone permissions with quality filters,
-   * then starts the Web Speech API recognition.
+   * Starts voice recognition with platform-specific optimization.
+   *
+   * Desktop: Requests getUserMedia first (for diagnostics), then starts recognition
+   * Mobile: Directly starts recognition (avoids permission conflicts)
    */
   const startListening = useCallback(async () => {
     if (!recognitionRef.current) {
@@ -357,11 +349,13 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
       return; // Already listening
     }
 
+    const isMobile = isMobileDevice();
+
     try {
       setTranscript(''); // Clear previous transcript
       setError(null);
 
-      // Request microphone permissions with quality filters first
+      // Check/request permissions (platform-specific)
       const hasPermissions = await requestMicrophonePermissions();
 
       if (!hasPermissions) {
@@ -370,10 +364,21 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
 
       // Start speech recognition
       recognitionRef.current.start();
-      console.log('🎙️ Voice recognition started with optimized audio settings');
+      console.log(
+        `🎙️ Voice recognition started (${isMobile ? 'MOBILE - single-shot' : 'DESKTOP - continuous'} mode)`
+      );
     } catch (err) {
       console.error('❌ Error starting recognition:', err);
-      setError('Error al iniciar el reconocimiento de voz.');
+
+      if (err instanceof Error && err.name === 'NotAllowedError') {
+        setError(
+          isMobile
+            ? 'Permisos de micrófono denegados. Revisa configuración del navegador.'
+            : 'Permisos de micrófono denegados. Por favor, permite el acceso.'
+        );
+      } else {
+        setError('Error al iniciar el reconocimiento de voz.');
+      }
     }
   }, [isListening, requestMicrophonePermissions]);
 

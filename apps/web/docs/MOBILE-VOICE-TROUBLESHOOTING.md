@@ -54,9 +54,11 @@ Esta guía te ayudará a diagnosticar y resolver problemas con el reconocimiento
 - Solo transcribe las primeras palabras
 - Se detiene después de 1-2 segundos
 
-**Solución aplicada (v1.2):**
-- ✅ Ahora `continuous: true` está habilitado para todos los dispositivos
-- ✅ La detección de silencio espera 1.5 segundos antes de detenerse
+**Solución aplicada (v2.0):**
+- ✅ **Móviles**: Modo single-shot (`continuous: false`) para mayor estabilidad
+- ✅ **Desktop**: Modo continuous (`continuous: true`) para conversaciones fluidas
+- ✅ La detección de silencio en desktop espera 1.5 segundos antes de detenerse
+- ✅ En móviles, se detiene automáticamente después del resultado final
 
 ### 3. Audio de mala calidad / Ruido de fondo
 
@@ -64,10 +66,10 @@ Esta guía te ayudará a diagnosticar y resolver problemas con el reconocimiento
 - Transcripciones incorrectas
 - No detecta palabras claramente pronunciadas
 
-**Solución aplicada (v1.2):**
-- ✅ `noiseSuppression: true` ahora habilitado para móviles
-- ✅ `echoCancellation: true` para reducir eco
-- ✅ `autoGainControl: true` para normalizar volumen
+**Solución aplicada (v2.0):**
+- ✅ **Desktop**: getUserMedia con filtros de calidad para diagnóstico
+- ✅ **Móviles**: SpeechRecognition gestiona audio nativamente (mejor compatibilidad)
+- ✅ `echoCancellation: true`, `noiseSuppression: true`, `autoGainControl: true` (desktop)
 
 **Recomendaciones adicionales:**
 - Habla cerca del micrófono (10-15 cm)
@@ -146,31 +148,25 @@ Para ver logs detallados del reconocimiento de voz:
 3. **Logs esperados:**
 ```
 🔧 Speech Recognition configured for MOBILE:
-  continuous: true
+  continuous: false
   interimResults: true
   lang: "es-ES"
   device: "Mobile"
+  note: "Single-shot mode for better stability"
 
-🎤 Requesting microphone (MOBILE mode)...
-
-✅ Microphone permissions granted
-🎙️ Audio tracks: 1
-
-📱 Mobile audio configuration:
-  - Sample rate: 48000
-  - Echo cancellation: true
-  - Noise suppression: true
-  - Auto gain control: true
+📱 Mobile mode: Skipping getUserMedia, SpeechRecognition will handle permissions
+💡 TIP: Accept microphone permission when prompted by the browser
+🎙️ Voice recognition started (MOBILE - single-shot mode)
 
 🎤 Voice recognition started - Microphone is active
-🔊 Audio capture started - System is receiving audio
-🎵 Sound detected - Microphone is picking up sound
-🗣️ Speech detected - Voice recognition active
 
 📝 Interim transcription: "hola" (confidence: 0%)
 📝 Final transcription: "hola cómo estás" (confidence: 95.3%)
+📱 Mobile: Final result received, recognition will stop automatically
 
-🔇 Silence detected, stopping recognition
+🔄 Voice recognition ended (MOBILE)
+📱 Mobile device - recognition stopped naturally
+💡 TIP: On mobile, speak clearly and ensure microphone permissions are granted
 ```
 
 ## 📋 Checklist de Troubleshooting
@@ -191,20 +187,18 @@ Antes de reportar un problema, verifica:
 ### Configuración del Web Speech API
 
 ```typescript
-// Configuración actual (v1.2)
+// Configuración actual (v2.0)
 recognition.lang = 'es-ES';
-recognition.continuous = true;  // ✅ Siempre continuo
+recognition.continuous = !isMobile;  // ✅ Desktop: true, Móvil: false
 recognition.interimResults = true;
 recognition.maxAlternatives = 1;
 
-// Audio constraints
+// Audio constraints (SOLO en Desktop)
+// En móviles, SpeechRecognition gestiona audio nativamente
 audio: {
-  echoCancellation: true,      // ✅ Activo en móviles
-  noiseSuppression: true,      // ✅ Activo en móviles
-  autoGainControl: true,
-  sampleRate: { ideal: 48000 }, // Móvil: Alta calidad
-  channelCount: 1,              // Mono
-  latency: { ideal: 0 }         // Baja latencia
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true
 }
 ```
 
@@ -229,6 +223,15 @@ Si después de seguir esta guía el problema persiste:
 
 ## 🔄 Historial de Cambios
 
+### v2.0 (2025-01-17) - SOLUCIÓN DEFINITIVA
+- ✅ **SOLUCIÓN MÓVIL**: Eliminado getUserMedia en móviles para evitar conflictos
+- ✅ **Modo single-shot en móviles**: `continuous: false` para mayor estabilidad
+- ✅ **Modo continuous en desktop**: Mantiene experiencia fluida
+- ✅ **Permisos simplificados**: Solo 1 solicitud en móviles (SpeechRecognition)
+- ✅ **Manejo robusto de eventos**: No depende de eventos no confiables en móviles
+- ✅ **Logging mejorado**: Identifica claramente MOBILE vs DESKTOP
+- ✅ **Consumo optimizado**: Menor uso de batería en móviles
+
 ### v1.2 (2025-01-17)
 - ✅ Habilitado `noiseSuppression: true` para móviles
 - ✅ Habilitado `continuous: true` para todos los dispositivos
@@ -242,3 +245,4 @@ Si después de seguir esta guía el problema persiste:
 ---
 
 **Última actualización:** 17 de Enero de 2025
+**Versión actual:** 2.0 - Solución definitiva para móviles
