@@ -14,9 +14,10 @@ import type { ChatMessage as ChatMessageType } from './useAIChat';
 
 interface ChatMessageProps {
   message: ChatMessageType;
+  isGeneratingAudio?: boolean;
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, isGeneratingAudio = false }: ChatMessageProps) {
   const isUser = message.role === 'user';
 
   return (
@@ -52,9 +53,24 @@ export function ChatMessage({ message }: ChatMessageProps) {
             : 'bg-[var(--neutral-100)] text-[var(--neutral-900)]'
         }`}
       >
-        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-          {message.content}
-        </p>
+        {!isUser && isGeneratingAudio ? (
+          // Show "Razonando..." while generating audio for assistant messages
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              <span className="w-2 h-2 rounded-full bg-[var(--primary-600)] animate-pulse" style={{ animationDelay: '0ms' }} />
+              <span className="w-2 h-2 rounded-full bg-[var(--primary-600)] animate-pulse" style={{ animationDelay: '150ms' }} />
+              <span className="w-2 h-2 rounded-full bg-[var(--primary-600)] animate-pulse" style={{ animationDelay: '300ms' }} />
+            </div>
+            <p className="text-sm leading-relaxed text-[var(--neutral-600)] italic">
+              Razonando...
+            </p>
+          </div>
+        ) : (
+          // Show actual message content
+          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+            {message.content}
+          </p>
+        )}
       </div>
     </div>
   );

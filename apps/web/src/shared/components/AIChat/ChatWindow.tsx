@@ -52,6 +52,7 @@ interface ChatWindowProps {
 export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   const [inputValue, setInputValue] = useState('');
   const [isDictationMode, setIsDictationMode] = useState(false);
+  const [generatingMessageId, setGeneratingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const lastSpokenMessageIdRef = useRef<string | null>(null);
@@ -128,19 +129,31 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
       console.log('🗣️ Speaking new message with ElevenLabs:', lastMessage.id);
       // Mark this message as spoken
       lastSpokenMessageIdRef.current = lastMessage.id;
+      // Mark message as generating audio
+      setGeneratingMessageId(lastMessage.id);
       // Speak the agent's response (ElevenLabs returns a promise)
       synthesis.speak(lastMessage.content).catch((err) => {
         console.error('Error speaking with ElevenLabs:', err);
+        setGeneratingMessageId(null);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat.messages, isDictationMode]); // Only depend on messages and dictation mode, not synthesis
+
+  // Clear generating state when audio starts playing
+  useEffect(() => {
+    if (synthesis.isSpeaking && generatingMessageId) {
+      console.log('🎙️ Audio started playing, clearing generating state');
+      setGeneratingMessageId(null);
+    }
+  }, [synthesis.isSpeaking, generatingMessageId]);
 
   // BARGE-IN: Stop agent speech when user starts speaking
   useEffect(() => {
     if (voice.isListening && (synthesis.isSpeaking || synthesis.isGenerating)) {
       console.log('⚡ Barge-in: User started speaking, stopping agent');
       synthesis.stop();
+      setGeneratingMessageId(null);
     }
   }, [voice.isListening, synthesis]);
 
@@ -267,7 +280,11 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
             ) : (
               <>
                 {chat.messages.map((message) => (
-                  <ChatMessage key={message.id} message={message} />
+                  <ChatMessage
+                    key={message.id}
+                    message={message}
+                    isGeneratingAudio={message.id === generatingMessageId}
+                  />
                 ))}
 
                 {/* Typing indicator */}
