@@ -365,7 +365,8 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                   <span className="font-semibold">🎤 Escuchando... Habla ahora</span>
                 </div>
                 <p className="text-xs text-[var(--neutral-600)]">
-                  💡 Habla claramente cerca del micrófono. Abre la consola del navegador para ver logs de diagnóstico.
+                  💡 <span className="hidden sm:inline">Habla claramente cerca del micrófono. Abre la consola del navegador (F12) para ver logs de diagnóstico detallados.</span>
+                  <span className="sm:hidden">Habla claramente cerca del micrófono. Asegúrate de que los permisos estén activados en la configuración del navegador.</span>
                 </p>
               </div>
             )}

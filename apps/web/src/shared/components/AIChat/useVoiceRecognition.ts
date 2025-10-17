@@ -50,7 +50,7 @@ const isMobileDevice = () => {
 /**
  * Audio constraints for high-quality voice recognition.
  * These settings help reduce echo, background noise, and normalize volume levels.
- * For mobile, we use more aggressive settings to improve detection.
+ * For mobile, we use optimized settings to improve detection.
  */
 const getAudioConstraints = (): MediaStreamConstraints => {
   const isMobile = isMobileDevice();
@@ -58,12 +58,13 @@ const getAudioConstraints = (): MediaStreamConstraints => {
   return {
     audio: {
       echoCancellation: true, // Reduces echo from speakers
-      noiseSuppression: !isMobile, // Disable on mobile for better voice detection
+      noiseSuppression: true, // ✅ FIXED: Now enabled for mobile too
       autoGainControl: true, // Normalizes microphone volume
-      // Mobile-specific: Request high sample rate
+      // Mobile-specific: Request high sample rate for better quality
       ...(isMobile && {
-        sampleRate: 48000,
+        sampleRate: { ideal: 48000 },
         channelCount: 1,
+        latency: { ideal: 0 }, // Low latency for real-time
       }),
     },
   };
@@ -92,9 +93,9 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
 
         // Configuration optimized for mobile devices
         recognition.lang = 'es-ES'; // Spanish language
-        recognition.continuous = isMobile ? false : true; // Mobile: single-shot, Desktop: continuous
-        recognition.interimResults = true; // Show interim results
-        recognition.maxAlternatives = 1; // One alternative
+        recognition.continuous = true; // ✅ FIXED: Always continuous for better mobile experience
+        recognition.interimResults = true; // Show interim results for immediate feedback
+        recognition.maxAlternatives = 1; // One alternative to reduce processing
 
         console.log(
           `🔧 Speech Recognition configured for ${isMobile ? 'MOBILE' : 'DESKTOP'}:`,
@@ -102,6 +103,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
             continuous: recognition.continuous,
             interimResults: recognition.interimResults,
             lang: recognition.lang,
+            device: isMobile ? 'Mobile' : 'Desktop'
           }
         );
 
@@ -204,17 +206,17 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
         };
 
         recognition.onend = () => {
-          console.log('🔄 Voice recognition ended');
-
-          // On mobile, if we have no transcript yet and the user is still trying,
-          // automatically restart (up to 3 times)
           const isMobile = isMobileDevice();
-          if (isMobile && isListening) {
-            // Let the stopListening function handle the actual stop
-            console.log('📱 Mobile: Recognition ended, waiting for user action...');
-          }
+          console.log(`🔄 Voice recognition ended (${isMobile ? 'MOBILE' : 'DESKTOP'})`);
 
+          // Always set listening to false when recognition ends
           setIsListening(false);
+
+          // Log device-specific info for debugging
+          if (isMobile) {
+            console.log('📱 Mobile device - recognition stopped naturally');
+            console.log('💡 TIP: On mobile, speak clearly and ensure microphone permissions are granted');
+          }
         };
 
         recognitionRef.current = recognition;
@@ -274,29 +276,65 @@ export function useVoiceRecognition(): UseVoiceRecognitionReturn {
       }
       audioStreamRef.current = stream;
 
-      // Test audio levels
+      // Test audio levels and log detailed info
       console.log('✅ Microphone permissions granted');
       console.log('🎙️ Audio tracks:', stream.getAudioTracks().length);
 
       const audioTrack = stream.getAudioTracks()[0];
       if (audioTrack) {
-        console.log('🔊 Audio track settings:', audioTrack.getSettings());
-        console.log('📊 Audio track capabilities:', audioTrack.getCapabilities());
+        const settings = audioTrack.getSettings();
+        console.log('🔊 Audio track settings:', settings);
+
+        // Mobile-specific diagnostics
+        if (isMobile) {
+          console.log('📱 Mobile audio configuration:');
+          console.log('  - Sample rate:', settings.sampleRate || 'default');
+          console.log('  - Echo cancellation:', settings.echoCancellation);
+          console.log('  - Noise suppression:', settings.noiseSuppression);
+          console.log('  - Auto gain control:', settings.autoGainControl);
+        }
+
+        // Check capabilities (may not be available on all browsers)
+        try {
+          const capabilities = audioTrack.getCapabilities();
+          console.log('📊 Audio track capabilities:', capabilities);
+        } catch (e) {
+          console.log('ℹ️ Capabilities API not supported on this browser');
+        }
       }
 
       return true;
     } catch (err) {
       console.error('❌ Error requesting microphone permissions:', err);
+      const isMobile = isMobileDevice();
 
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          const mobileHint = isMobile
+            ? ' En móvil, revisa la configuración del navegador y permisos del sistema.'
+            : '';
           setError(
-            'Permisos de micrófono denegados. Por favor, permite el acceso al micrófono.'
+            `Permisos de micrófono denegados. Por favor, permite el acceso al micrófono.${mobileHint}`
           );
         } else if (err.name === 'NotFoundError') {
           setError('No se encontró ningún micrófono. Verifica tu dispositivo.');
+        } else if (err.name === 'NotReadableError') {
+          setError(
+            isMobile
+              ? 'El micrófono está en uso por otra app. Cierra otras apps y vuelve a intentar.'
+              : 'El micrófono está siendo usado por otra aplicación.'
+          );
         } else {
-          setError('Error al acceder al micrófono.');
+          setError(`Error al acceder al micrófono: ${err.message}`);
+        }
+
+        // Additional mobile troubleshooting tips
+        if (isMobile) {
+          console.log('🔧 Troubleshooting móvil:');
+          console.log('  1. Verifica permisos del navegador en configuración del sistema');
+          console.log('  2. Asegúrate de usar HTTPS (requerido para getUserMedia)');
+          console.log('  3. Cierra otras apps que puedan estar usando el micrófono');
+          console.log('  4. Intenta recargar la página');
         }
       }
 
