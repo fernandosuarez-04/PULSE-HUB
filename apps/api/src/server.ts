@@ -2,8 +2,8 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Configurar dotenv con el path explícito
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Configurar dotenv con el path explícito hacia la raíz del proyecto
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 import express, { Application } from 'express';
 import cors from 'cors';

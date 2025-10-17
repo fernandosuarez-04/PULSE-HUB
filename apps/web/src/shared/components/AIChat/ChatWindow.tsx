@@ -51,6 +51,7 @@ interface ChatWindowProps {
 
 export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   const [inputValue, setInputValue] = useState('');
+  const [isDictationMode, setIsDictationMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const lastSpokenMessageIdRef = useRef<string | null>(null);
@@ -102,13 +103,15 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
         voice.clearTranscript();
         setInputValue('');
         chat.sendMessage(messageToSend);
+        // Reset dictation mode after sending message to ensure next response can be spoken
+        setIsDictationMode(false);
       }
     }
   }, [voice.isListening, voice.transcript, chat.isTyping, chat, voice]);
 
-  // Auto-speak agent responses (only new messages)
+  // Auto-speak agent responses (only new messages and only when NOT in dictation mode)
   useEffect(() => {
-    if (chat.messages.length === 0 || !synthesis.isSupported) return;
+    if (chat.messages.length === 0 || !synthesis.isSupported || isDictationMode) return;
 
     const lastMessage = chat.messages[chat.messages.length - 1];
 
@@ -116,6 +119,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     // 1. It's an agent message
     // 2. We haven't spoken this message before
     // 3. The message has content
+    // 4. We're NOT in dictation mode
     if (
       lastMessage.role === 'assistant' &&
       lastMessage.id !== lastSpokenMessageIdRef.current &&
@@ -130,7 +134,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chat.messages]); // Only depend on messages, not synthesis
+  }, [chat.messages, isDictationMode]); // Only depend on messages and dictation mode, not synthesis
 
   // BARGE-IN: Stop agent speech when user starts speaking
   useEffect(() => {
@@ -145,6 +149,8 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
     if (inputValue.trim() && !chat.isTyping) {
       chat.sendMessage(inputValue);
       setInputValue('');
+      // Reset dictation mode when sending text message to ensure responses can be spoken
+      setIsDictationMode(false);
     }
   };
 
@@ -156,6 +162,18 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
   };
 
   const handleVoiceToggle = () => {
+    // Full voice mode - agent will speak responses
+    setIsDictationMode(false);
+    if (voice.isListening) {
+      voice.stopListening();
+    } else {
+      voice.startListening();
+    }
+  };
+
+  const handleDictationToggle = () => {
+    // Dictation mode - agent will NOT speak responses
+    setIsDictationMode(true);
     if (voice.isListening) {
       voice.stopListening();
     } else {
@@ -196,25 +214,7 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <div>
                 <h3 className="font-semibold text-base">Asistente IA</h3>
                 <p className="text-xs text-white/80">
-                  {synthesis.isGenerating ? (
-                    <span key="generating" className="inline-flex items-center">
-                      <Loader2
-                        size={12}
-                        className="inline-block mr-1.5 animate-spin"
-                        aria-hidden="true"
-                      />
-                      Preparando voz...
-                    </span>
-                  ) : synthesis.isSpeaking ? (
-                    <span key="speaking" className="inline-flex items-center">
-                      <Volume2
-                        size={12}
-                        className="inline-block mr-1.5 animate-pulse"
-                        aria-hidden="true"
-                      />
-                      Hablando...
-                    </span>
-                  ) : chat.isConnected ? (
+                  {chat.isConnected ? (
                     <span key="online" className="inline-flex items-center">
                       <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent-green)] mr-1.5" />
                       En línea
@@ -226,12 +226,6 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
                     </span>
                   )}
                 </p>
-                {/* Voice info */}
-                {synthesis.isSupported && synthesis.selectedVoice && (
-                  <p className="text-[10px] text-white/60 mt-0.5">
-                    🎙️ ElevenLabs AI Voice
-                  </p>
-                )}
               </div>
             </div>
             <button
@@ -440,23 +434,27 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               )}
 
               <button
-                type="submit"
-                disabled={!chat.isConnected || chat.isTyping || !inputValue.trim() || voice.isListening}
-                title="Enviar pregunta"
-                className="px-3 py-2.5 bg-[var(--primary-600)] text-white
-                  rounded-2xl hover:bg-[var(--primary-600)]/90
+                type="button"
+                onClick={handleDictationToggle}
+                disabled={!chat.isConnected || chat.isTyping}
+                title="Dictado de voz (sin respuesta hablada)"
+                className={`px-3 py-2.5 rounded-2xl
                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed
                   flex items-center justify-center min-w-[40px]
                   lg:px-4 lg:py-2.5 lg:min-w-[44px]
                   md:px-3 md:py-2 md:min-w-[40px]
                   sm:px-3 sm:py-2 sm:min-w-[40px]
-                  max-sm:px-2 max-sm:py-2 max-sm:min-w-[36px]"
-                aria-label="Enviar mensaje"
+                  max-sm:px-2 max-sm:py-2 max-sm:min-w-[36px]
+                  ${voice.isListening && isDictationMode
+                    ? 'bg-[var(--accent-red)] text-white hover:bg-[var(--accent-red)]/90'
+                    : 'bg-[var(--primary-600)] text-white hover:bg-[var(--primary-600)]/90'
+                  }`}
+                aria-label={voice.isListening && isDictationMode ? 'Detener dictado' : 'Iniciar dictado de voz'}
               >
                 {chat.isTyping ? (
                   <Loader2 size={18} className="animate-spin" />
                 ) : (
-                  <Send size={18} />
+                  <Mic size={18} />
                 )}
               </button>
             </div>
@@ -469,8 +467,8 @@ export function ChatWindow({ isOpen, onClose, chat }: ChatWindowProps) {
               <span className="sm:hidden">Enter para enviar</span>
               {voice.isSupported && (
                 <>
-                  <span className="hidden sm:inline"> • Click en micrófono para modo de voz</span>
-                  <span className="sm:hidden"> • Micrófono para voz</span>
+                  <span className="hidden sm:inline"> • Micrófono para dictar • Ecualizador para modo de voz completo</span>
+                  <span className="sm:hidden"> • Mic para dictar • Ecualizador para voz</span>
                 </>
               )}
             </p>
